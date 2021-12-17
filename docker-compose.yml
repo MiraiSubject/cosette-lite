@@ -1,0 +1,15 @@
+version: '3'
+services:
+  cosette-lite:
+    restart: always
+    build: . 
+    image: 'git.subject.moe/mirai/oth-verification-express'
+    ports:
+      - '8000:8000'
+    environment:
+      - NODE_ENV=production
+    depends_on:
+      - redis
+  redis:
+    restart: always
+    image: redis:alpine
