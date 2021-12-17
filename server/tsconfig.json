@@ -1,0 +1,18 @@
+/* server/tsconfig.json */
+/* this is a basic tsconfig.json file. You can add to/remove and modify everything except the module option */
+{
+    "compilerOptions": {
+        "target": "es2020",
+        "module": "commonjs",
+        "noEmit": true,
+        "strict": false,
+        "noUnusedLocals": false,
+        "noUnusedParameters": false,
+        "noImplicitReturns": true,
+        "noFallthroughCasesInSwitch": true,
+        "esModuleInterop": true,
+        "experimentalDecorators": true,
+        "emitDecoratorMetadata": true,
+        "baseUrl": "./server"
+    }
+}
