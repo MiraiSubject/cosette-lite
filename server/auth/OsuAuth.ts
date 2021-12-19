@@ -64,11 +64,12 @@ export class OsuAuthentication extends AuthenticationClient {
     protected callbackMiddleWare(req: Request, res: Response, next: NextFunction): void {
         const now = DateTime.now().minus({ months: 6 });
         const u = req.user as IUser;
-        const userJoinDate = u.osu.joinDate!
-        console.log(now, userJoinDate);
+        const userJoinDate = u.osu.joinDate!;
+
         if (now > userJoinDate) {
             res.redirect('/checks/discord');
         } else {
+            u.failureReason = "osu! account is not older than 6 months yet";
             consola.info(`${u.osu.displayName} joined on ${userJoinDate} needs manual verification.`)
             res.redirect('/checks/manual');
         }
