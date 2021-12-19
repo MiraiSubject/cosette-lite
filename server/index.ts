@@ -35,7 +35,8 @@ export default class Server {
         const nuxt = await loadNuxt(isDev ? 'dev' : 'start', rootDir);
 
         consola.wrapConsole();
-        container.register<SessionProvider>(SessionProvider, { useValue: new SessionProvider('127.0.0.1', 6379)})
+
+        container.register<SessionProvider>(SessionProvider, { useValue: new SessionProvider() })
         const redis = container.resolve(SessionProvider);
         const redisStore = redis.getStore();
 
@@ -74,7 +75,6 @@ export default class Server {
         app.use(rateLimiterMiddleware);
         app.use(bodyParser.json());
 
-
         const o = new OsuAuthentication();
         app.use(`/auth${o.RootURL}`, o.router);
         console.log(`/auth${o.RootURL}`);
@@ -88,8 +88,8 @@ export default class Server {
         app.get('/discord-check', (req: Request, res: Response, next: NextFunction) => {
             if (req.isAuthenticated())
                 return next()
-            else
-                console.error("Redirected user to front page due to cookie errors or missing osu! information. Could be anything.")
+
+            console.error("Redirected user to front page due to cookie errors or missing osu! information. Could be anything.")
             res.redirect('/');
         });
 
@@ -108,10 +108,8 @@ export default class Server {
 
         app.use(nuxt.render);
 
-
         app.listen(port, '0.0.0.0');
         console.log("Listening");
-
     }
 }
 
