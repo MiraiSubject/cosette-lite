@@ -12,4 +12,5 @@ export interface IUser {
         token?: string;
         joinDate?: DateTime;
     }
+    failureReason?: string;
 }
