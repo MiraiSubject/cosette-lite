@@ -59,10 +59,10 @@ export class DiscordAuthentication extends AuthenticationClient {
     }
 
     private async discordJoin(userId: string, token: string, nickname: string) {
+        consola.info(`Attemptingto join ${userId} with ${nickname} to ${this.guildId}`);
         try {
             const response = await axios.put(`https://discordapp.com/api/guilds/${this.guildId}/members/${userId}`, {
                 access_token: token,
-                nick: nickname
             }, {
                 headers: {
                     "Content-Type": "application/json",
