@@ -36,6 +36,7 @@
         original owners.
       </p>
       <p>This is an <strong>unofficial</strong> server.</p>
+      <p>By proceeding you will agree to the <strong>functional</strong> use of cookies.</p>
     </div>
     <a
       href="/auth/osu"
