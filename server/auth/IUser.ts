@@ -1,3 +1,5 @@
+import { DateTime } from "luxon";
+
 export interface IUser {
     discord: {
         id?: string;
@@ -8,5 +10,6 @@ export interface IUser {
         id?: string;
         displayName?: string;
         token?: string;
+        joinDate?: DateTime;
     }
 }
