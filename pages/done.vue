@@ -1,15 +1,11 @@
 <template>
   <div class="start">
-    <div class="grid-container container flex center-align">
-      <div class="row">
-        <div>
-          <h1>Welcome to the osu! Tournament Hub</h1>
-        </div>
-        <div>
-          <p>Your account is now verified. Welcome to the server!</p>
-          <p>You can now close this browser tab.</p>
-        </div>
-      </div>
+    <div>
+      <h1>Welcome to the osu! Tournament Hub</h1>
+    </div>
+    <div>
+      <p>Your account is now verified. Welcome to the server!</p>
+      <p>You can now close this browser tab.</p>
     </div>
   </div>
 </template>
