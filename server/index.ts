@@ -1,5 +1,4 @@
 import path from 'path'
-import fs from 'fs';
 import "reflect-metadata"
 
 // @ts-ignore
@@ -36,7 +35,7 @@ export default class Server {
         const nuxt = await loadNuxt(isDev ? 'dev' : 'start', rootDir);
 
         consola.wrapConsole();
-        container.register<SessionProvider>(SessionProvider, { useValue: new SessionProvider('redis', 6379)})
+        container.register<SessionProvider>(SessionProvider, { useValue: new SessionProvider('127.0.0.1', 6379)})
         const redis = container.resolve(SessionProvider);
         const redisStore = redis.getStore();
 
@@ -46,8 +45,11 @@ export default class Server {
             resave: false,
             proxy: true,
             saveUninitialized: false,
-            cookie: { secure: process.env.NODE_ENV === 'production' },
-            store: new redisStore({ client: redis.getClient(), ttl: 86400 }),
+            cookie: {
+                secure: false,
+                maxAge: 300 * 1000
+            },
+            store: new redisStore({ client: redis.getClient(), ttl: 600 }),
         }
 
         if (process.env.NODE_ENV === 'production') {
@@ -58,7 +60,7 @@ export default class Server {
 
         const corsOptions: CorsOptions = {
             allowedHeaders: ['Origin', 'X-Requested-With', 'Content-Type', 'Accept', 'X-Access-Token', 'Authorization'],
-            origin: ['http://localhost:3000', 'http://localhost:8000', 'http://10.0.1.110:8000', 'http://10.0.1.110:3000'],
+            origin: ['http://localhost:3000', 'http://localhost:8000', 'http://10.0.1.110:8000', 'http://10.0.1.110:3000', 'https://oth.mirai.gg/', 'https://oth.mirai.gg/'],
             optionsSuccessStatus: 200,
             preflightContinue: false,
             credentials: true

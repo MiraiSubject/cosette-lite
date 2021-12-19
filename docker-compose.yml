@@ -3,11 +3,19 @@ services:
   cosette-lite:
     restart: always
     build: . 
-    image: 'git.subject.moe/mirai/oth-verification-express'
     ports:
       - '8000:8000'
     environment:
       - NODE_ENV=production
+      - DISCORD_GUILD_ID=
+      - DISCORD_CLIENT_ID=
+      - DISCORD_CLIENT_SECRET=
+      - DISCORD_CALLBACK_URL=
+      - DISCORD_BOT_TOKEN=
+      - OSU2_CLIENT_ID=
+      - OSU2_CLIENT_SECRET=
+      - OSU2_CALLBACK_URL=
+      - COOKIE_SECRET=
     depends_on:
       - redis
   redis:
