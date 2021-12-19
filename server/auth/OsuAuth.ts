@@ -1,10 +1,11 @@
 import passport from "passport";
-import OsuStrategy from "passport-osu";
+import OsuStrategy, { PassportProfile } from "passport-osu";
 import { injectable } from "tsyringe";
 import { AuthenticationClient } from "./AuthenticationClient";
 import consola from "consola";
-import { Request } from 'express';
+import { NextFunction, Request, Response } from 'express';
 import { IUser } from "./IUser";
+import { DateTime } from "luxon";
 
 @injectable()
 export class OsuAuthentication extends AuthenticationClient {
@@ -27,14 +28,15 @@ export class OsuAuthentication extends AuthenticationClient {
             clientSecret: this.clientSecret,
             callbackURL: this.callbackURL,
             passReqToCallback: true,
-        }, (req: Request, _accessToken: string, _refreshToken: string, profile: any, cb: any) => {
+        }, (req: Request, _accessToken: string, _refreshToken: string, profile: PassportProfile, cb: any) => {
             if (!req.user) {
                 const o: IUser = {
                     discord: {},
                     osu: {
-                        id: profile.id,
+                        id: `${profile.id}`,
                         displayName: profile.displayName,
-                        token: profile.token
+                        token: _accessToken,
+                        joinDate: DateTime.fromISO(profile._json.join_date)
                     }
                 }
 
@@ -45,8 +47,10 @@ export class OsuAuthentication extends AuthenticationClient {
 
                 const o: IUser = req.user as any;
 
-                o.osu.id = profile.id;
+                o.osu.id = `${profile.id}`;
+                o.osu.token = _accessToken;
                 o.osu.displayName = profile.displayName;
+                o.osu.joinDate = DateTime.fromISO(profile._json.join_date);
 
                 return cb(null, o);
             }
@@ -55,5 +59,18 @@ export class OsuAuthentication extends AuthenticationClient {
         this.AddRoutes("osu", '/discord-check');
 
         consola.success("osu! authentication routes are registered.")
+    }
+
+    protected callbackMiddleWare(req: Request, res: Response, next: NextFunction): void {
+        const now = DateTime.now().minus({ months: 6 });
+        const u = req.user as IUser;
+        const userJoinDate = u.osu.joinDate!
+        console.log(now, userJoinDate);
+        if (now > userJoinDate) {
+            res.redirect('/checks/discord');
+        } else {
+            consola.info(`${u.osu.displayName} joined on ${userJoinDate} needs manual verification.`)
+            res.redirect('/checks/manual');
+        }
     }
 }
