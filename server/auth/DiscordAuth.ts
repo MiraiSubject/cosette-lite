@@ -8,6 +8,7 @@ import consola from "consola";
 import passport from "passport";
 import { Client, GuildMember } from 'discord.js';
 import DiscordBot from '../DiscordBot';
+import { AxiosError } from 'axios'
 
 @injectable()
 export class DiscordAuthentication extends AuthenticationClient {
@@ -77,32 +78,50 @@ export class DiscordAuthentication extends AuthenticationClient {
             else if (response.status === 204)
                 consola.success("User already in guild");
 
-            this.addRoles(userId, nickname)
+            this.setUpUser(userId, nickname)
         } catch (e) {
+            const error = e as AxiosError;
+
+            if (error.response === undefined)
+                return;
+
+            // Apparently this means the user has reached max guild.
+            // So handle like a valid response. 
+            if (error.response.status === 400) {
+                consola.info(`${userId} has reached max guilds, attempting to add roles anyway.`);
+                this.setUpUser(userId, nickname);
+            }
+
             consola.error(`An error occured while trying to join ${userId} Detailed error description: ${e}`);
         }
     }
 
-    private async addRoles(userId: string, nickname: string) {
+    private async setUpUser(userId: string, nickname: string) {
         const client = container.resolve<Client>(Client) as DiscordBot;
         const guild = client.guilds.cache.get(this.guildId);
 
         if (guild === undefined)
             return;
 
-        await guild.members.fetch()
+        await guild.members.fetch();
         const guildMember = guild.members.cache.get(userId);
         const role = guild.roles.cache.find(role => role.name === 'Verified');
 
         if (role === undefined)
             return;
-        
-        if (guildMember === undefined)
-            return;
 
-        await guildMember.roles.add(role);
+        if (guildMember === undefined) {
+            consola.info(`Guild member ${userId} not found, moving on...`);
+            return;
+        }
+
         await this.changeNickName(nickname, guildMember);
-        client.emit('userVerified', guild, guildMember);
+
+        if (!guildMember.roles.cache.has(role.id)) {
+            await guildMember.roles.add(role);
+            client.emit('userVerified', guild, guildMember);
+        }
+
         consola.success(`Verified ${guildMember.user.username} / ${userId}`);
     }
 
