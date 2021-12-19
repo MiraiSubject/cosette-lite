@@ -62,6 +62,13 @@ a {
   }
 }
 
+@media (prefers-color-scheme: dark) {
+  html {
+    background-color: #000000;
+    color: #CECECE;
+  }
+}
+
 .button {
   width: 15rem;
   height: 2rem;
@@ -70,13 +77,13 @@ a {
   text-decoration: none;
   background-color: #ff66aa;
   border-radius: 5px;
-  display: flex;
   align-items: center;
   justify-content: center;
 }
 
 .osu {
   background-color: #ff66aa;
+  color: #ffffff;
 }
 
 .discord {

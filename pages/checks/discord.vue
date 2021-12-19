@@ -27,7 +27,7 @@
     </div>
     <a
       href="/auth/discord"
-      class="button discord"
+      class="flex button discord"
     >
       Log in with Discord!
     </a>

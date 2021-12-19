@@ -40,7 +40,7 @@
     </div>
     <a
       href="/auth/osu"
-      class="button osu"
+      class="flex button osu"
     > Log in with osu! </a>
   </div>
 </template>
