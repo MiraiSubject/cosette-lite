@@ -49,7 +49,6 @@ export class DiscordAuthentication extends AuthenticationClient {
                 o.discord.id = profile.id;
                 o.discord.displayName = profile.username;
                 o.discord.token = accessToken
-                this.discordJoin(o.discord.id, accessToken, o.osu.displayName!);
                 return cb(null, o);
             }
         }));
