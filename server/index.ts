@@ -75,11 +75,12 @@ export default class Server {
         app.use(rateLimiterMiddleware);
         app.use(bodyParser.json());
 
-        const o = new OsuAuthentication();
+        const o = container.resolve<OsuAuthentication>(OsuAuthentication);
         app.use(`/auth${o.RootURL}`, o.router);
         console.log(`/auth${o.RootURL}`);
 
-        const d = new DiscordAuthentication([Scope.IDENTIFY, Scope.GUILDS_JOIN]);
+        container.register<DiscordAuthentication>(DiscordAuthentication, { useValue: new DiscordAuthentication([Scope.IDENTIFY, Scope.GUILDS_JOIN])})
+        const d = container.resolve(DiscordAuthentication);
         app.use(`/auth${d.RootURL}`, d.router);
         console.log(`/auth${d.RootURL}`);
 

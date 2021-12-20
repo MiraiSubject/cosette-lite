@@ -1,7 +1,7 @@
 import { Profile, Scope, Strategy, VerifyCallback } from '@oauth-everything/passport-discord';
 import { AuthenticationClient } from "./AuthenticationClient";
 import { IUser } from './IUser';
-import { Request } from 'express';
+import { Request, Response, NextFunction } from 'express';
 import { container, injectable } from "tsyringe";
 import axios from 'axios';
 import consola from "consola";
@@ -59,7 +59,7 @@ export class DiscordAuthentication extends AuthenticationClient {
         consola.success("Discord authentication routes are registered.")
     }
 
-    private async discordJoin(userId: string, token: string, nickname: string) {
+    private async discordJoin(userId: string, token: string, nickname: string): Promise<boolean | void> {
         consola.info(`Attemptingto join ${userId} with ${nickname} to ${this.guildId}`);
         try {
             const response = await axios.put(`https://discordapp.com/api/guilds/${this.guildId}/members/${userId}`, {
@@ -78,7 +78,7 @@ export class DiscordAuthentication extends AuthenticationClient {
             else if (response.status === 204)
                 consola.success("User already in guild");
 
-            this.setUpUser(userId, nickname)
+            await this.setUpUser(userId, nickname)
         } catch (e) {
             const error = e as AxiosError;
 
@@ -89,37 +89,53 @@ export class DiscordAuthentication extends AuthenticationClient {
             // So handle like a valid response. 
             if (error.response.status === 400) {
                 consola.info(`${userId} has reached max guilds, attempting to add roles anyway.`);
-                this.setUpUser(userId, nickname);
+                const exists = await this.findGuildMember(userId);
+                if (typeof exists === 'boolean')
+                    return exists;
+                else
+                    this.setUpUser(userId, nickname);
             }
 
             consola.error(`An error occured while trying to join ${userId} Detailed error description: ${e}`);
         }
     }
 
-    private async setUpUser(userId: string, nickname: string) {
+    private async findGuildMember(userId: string): Promise<GuildMember | boolean> {
         const client = container.resolve<Client>(Client) as DiscordBot;
         const guild = client.guilds.cache.get(this.guildId);
 
         if (guild === undefined)
-            return;
+            return false;
 
         await guild.members.fetch();
         const guildMember = guild.members.cache.get(userId);
-        const role = guild.roles.cache.find(role => role.name === 'Verified');
-
-        if (role === undefined)
-            return;
 
         if (guildMember === undefined) {
             consola.info(`Guild member ${userId} not found, moving on...`);
-            return;
+            return false;
         }
+
+        return guildMember;
+    }
+
+    private async setUpUser(userId: string, nickname: string): Promise<void> {
+        const client = container.resolve<Client>(Client) as DiscordBot;
+
+        const guildMember = await this.findGuildMember(userId);
+
+        if (typeof guildMember === 'boolean')
+            return;
+
+        const role = guildMember.guild.roles.cache.find(role => role.name === 'Verified');
+
+        if (role === undefined)
+            return;
 
         await this.changeNickName(nickname, guildMember);
 
         if (!guildMember.roles.cache.has(role.id)) {
             await guildMember.roles.add(role);
-            client.emit('userVerified', guild, guildMember);
+            client.emit('userVerified', guildMember.guild, guildMember);
         }
 
         consola.success(`Verified ${guildMember.user.username} / ${userId}`);
@@ -131,5 +147,19 @@ export class DiscordAuthentication extends AuthenticationClient {
         } catch (e) {
             consola.error(e);
         }
+    }
+
+    protected callbackMiddleWare(req: Request, res: Response, next: NextFunction): void {
+        const user = req.user as IUser;
+
+        // Typescript being scuffed on overridden functions from parent class.
+        const d = container.resolve(DiscordAuthentication);
+        const success = d.discordJoin(user.discord.id!, user.discord.token!, user.osu.displayName!);
+        success.then((value) => {
+            if (typeof value === 'boolean')
+                res.redirect('/full');
+            else
+                res.redirect('/done')
+        })
     }
 }
