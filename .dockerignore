@@ -1,3 +1,5 @@
 node_modules
 .env.example
 .nuxt
+build.sh
+docker-compose-live.yml

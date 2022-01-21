@@ -1,12 +1,6 @@
 import { Client, Guild, GuildMember, Intents, TextChannel } from 'discord.js';
 import { singleton } from 'tsyringe';
 
-import { ClientEvents } from 'discord.js';
-
-interface EventList extends ClientEvents {
-    joinedThroughWeb: [userId: string];
-}
-
 @singleton()
 export default class DiscordBot extends Client {
     constructor() {
@@ -17,7 +11,8 @@ export default class DiscordBot extends Client {
         });
 
         this.on('userVerified', (guild: Guild, member: GuildMember) => {
-            const channel = guild.channels.cache.find(c => c.name === 'general') as TextChannel;
+            const channel = guild.channels.cache.get('931251476297297930') as TextChannel;
+            // const channel = guild.channels.cache.find(c => c.name === 'general') as TextChannel;
             channel.send(`Welcome ${member} you are now verified!`)
         })
 
