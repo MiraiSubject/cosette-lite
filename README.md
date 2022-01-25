@@ -13,6 +13,8 @@ Most of the code should be self-explanatory, but if parts aren't feel free to hi
     - Docker
 - Redis (for session caching)
 
+Refer to the `.env.example` file for other variables that may needed like osu! and Discord OAuth2 Credentials as well as the Discord bot token. (Don't forget to rename it to `.env`)
+
 ## Developing
 
 Install dependencies:
@@ -20,6 +22,8 @@ Install dependencies:
 
 Develop with HMR:
 `yarn dev`
+
+To test production locally do `yarn build` and then `yarn start` to start a production server locally.
 
 ## Deploying to production
 
