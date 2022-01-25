@@ -1,9 +1,8 @@
 {
-  "name": "mirai-tournament-2020",
+  "name": "oth-verification-express",
   "version": "1.0.0",
-  "description": "Mirai. Tournament 2020",
+  "description": "",
   "author": "Subject",
-  "private": true,
   "scripts": {
     "build": "nuxt build",
     "dev": "cross-env NODE_ENV=development nodemon server/index.ts",
