@@ -7,7 +7,7 @@ I put this repo mostly out for transparency of what's happening behind the scene
 Most of the code should be self-explanatory, but if parts aren't feel free to hit me up in the tournament hub discord, or open an issue here.
 
 ## Requirements
-- Node.js (it was made using 16.13)
+- Node.js (LTS)
 - yarn
 - Optionally:
     - Docker
@@ -25,3 +25,8 @@ Develop with HMR:
 
 There is a `Dockerfile` present and a `docker-compose` file that can be used in a live environment. 
 
+If building on an ARM based system and deploy to Intel/AMD-based systems you will need to use something like:
+
+`docker buildx build --platform linux/amd64 --tag oth-verification .`
+
+to build it for the correct architecture. [Refer to the Docker documentation for more information](https://docs.docker.com/buildx/working-with-buildx/)
