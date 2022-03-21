@@ -53,7 +53,7 @@ export class DiscordAuthentication extends AuthenticationClient {
             }
         }));
 
-        this.AddRoutes("discord", '/done');
+        this.AddRoutes("discord");
 
         consola.success("Discord authentication routes are registered.")
     }
@@ -125,6 +125,7 @@ export class DiscordAuthentication extends AuthenticationClient {
         if (typeof guildMember === 'boolean')
             return;
 
+        // TODO: make db call for the role id.
         const role = guildMember.guild.roles.cache.find(role => role.name === 'Verified');
 
         if (role === undefined)
