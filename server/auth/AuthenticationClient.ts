@@ -29,7 +29,7 @@ export abstract class AuthenticationClient {
         next();
     }
 
-    protected AddRoutes(strategyName: string, successRedirect: string): void {
+    protected AddRoutes(strategyName: string): void {
         this.router.get("/", this.middleWare, passport.authenticate(strategyName));
         this.router.get("/cb", passport.authenticate(strategyName, { failureRedirect: '/'}), this.callbackMiddleWare);
     }

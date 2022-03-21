@@ -51,12 +51,11 @@ export class OsuAuthentication extends AuthenticationClient {
                 o.osu.token = _accessToken;
                 o.osu.displayName = profile.displayName;
                 o.osu.joinDate = DateTime.fromISO(profile._json.join_date);
-
                 return cb(null, o);
             }
         }));
 
-        this.AddRoutes("osu", '/discord-check');
+        this.AddRoutes("osu");
 
         consola.success("osu! authentication routes are registered.")
     }
