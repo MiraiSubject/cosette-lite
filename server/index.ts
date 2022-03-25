@@ -62,9 +62,21 @@ export default class Server {
         }
         consola.info(`Cookies secure: ${sessionOptions.cookie!.secure}`);
 
+        // Inject the variables
+        const configClass = container.resolve<Configuration>(Configuration);
+        const config = configClass.config;
+
+        let allowedOrigins = ['http://localhost:8000', 'https://10.0.1.110:8000', 'http://10.0.1.110:8000', 'https://oth.mirai.gg/']
+        if (config.domains.length > 0) {
+            for (let i = 0; i < config.domains.length; i++) {
+                allowedOrigins.push(`http://${config.domains[i]}`);
+                allowedOrigins.push(`https://${config.domains[i]}`)
+            }
+        }
+
         const corsOptions: CorsOptions = {
             allowedHeaders: ['Origin', 'X-Requested-With', 'Content-Type', 'Accept', 'X-Access-Token', 'Authorization'],
-            origin: ['http://localhost:3000', 'http://localhost:8000', 'http://10.0.1.110:8000', 'http://10.0.1.110:3000', 'https://oth.mirai.gg/', 'https://oth.mirai.gg/'],
+            origin: allowedOrigins,
             optionsSuccessStatus: 200,
             preflightContinue: false,
             credentials: true
@@ -79,9 +91,10 @@ export default class Server {
         app.use(bodyParser.json());
         app.use(flash());
 
-        // Inject the variables
-        const configClass = container.resolve<Configuration>(Configuration);
-        const config = configClass.config;
+        consola.info(`Allowed origins: `)
+        for (let i = 0; i < allowedOrigins.length; i++) {
+            console.log(`- ${allowedOrigins[i]}`);
+        }
 
         // Initialise API
         const api = container.resolve(ApiRouting);
@@ -100,7 +113,7 @@ export default class Server {
         container.register<Client>(Client, { useValue: new DiscordBot() });
 
         // Save data to session
-        passport.serializeUser((user: any, done: any) => { 
+        passport.serializeUser((user: any, done: any) => {
             done(null, user);
         });
 
