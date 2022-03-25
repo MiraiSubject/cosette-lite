@@ -1,5 +1,5 @@
-import path from 'path'
 import "reflect-metadata"
+import path from 'path'
 
 // @ts-ignore
 import { build, loadNuxt } from 'nuxt';
@@ -18,7 +18,10 @@ import bodyParser from 'body-parser';
 import { container } from 'tsyringe';
 import { Client } from 'discord.js';
 import DiscordBot from './DiscordBot';
-import SessionProvider from './SessionManager';
+import RedisSession from './RedisSession';
+import ApiRouting from './api/index';
+import { access } from 'fs/promises';
+import Configuration from './Configuration';
 
 export default class Server {
     private app: Express;
@@ -36,8 +39,7 @@ export default class Server {
 
         consola.wrapConsole();
 
-        container.register<SessionProvider>(SessionProvider, { useValue: new SessionProvider() })
-        const redis = container.resolve(SessionProvider);
+        const redis = container.resolve(RedisSession);
         const redisStore = redis.getStore();
 
         const sessionOptions: session.SessionOptions = {
@@ -56,8 +58,9 @@ export default class Server {
         if (process.env.NODE_ENV === 'production') {
             app.set('trust proxy', 1) // trust first proxy
             // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-            sessionOptions.cookie!.secure = true
+            sessionOptions.cookie!.secure = !!parseInt(process.env.COOKIE_SECURE ?? '0')
         }
+        consola.info(`Cookies secure: ${sessionOptions.cookie!.secure}`);
 
         const corsOptions: CorsOptions = {
             allowedHeaders: ['Origin', 'X-Requested-With', 'Content-Type', 'Accept', 'X-Access-Token', 'Authorization'],
@@ -75,30 +78,33 @@ export default class Server {
         app.use(rateLimiterMiddleware);
         app.use(bodyParser.json());
 
+        // Inject the variables
+        const configClass = container.resolve<Configuration>(Configuration);
+        const config = configClass.config;
+
+        // Initialise API
+        const api = container.resolve(ApiRouting);
+        app.use('/api', api.router);
+
+        // Initialise the authentication client for osu!
         const o = container.resolve<OsuAuthentication>(OsuAuthentication);
         app.use(`/auth${o.RootURL}`, o.router);
-        console.log(`/auth${o.RootURL}`);
 
-        container.register<DiscordAuthentication>(DiscordAuthentication, { useValue: new DiscordAuthentication([Scope.IDENTIFY, Scope.GUILDS_JOIN])})
+        // Initialise the authentocation client for Discord. 
+        container.register<DiscordAuthentication>(DiscordAuthentication, { useValue: new DiscordAuthentication([Scope.IDENTIFY, Scope.GUILDS_JOIN]) })
         const d = container.resolve(DiscordAuthentication);
         app.use(`/auth${d.RootURL}`, d.router);
-        console.log(`/auth${d.RootURL}`);
 
-        container.register(Client, { useValue: new DiscordBot() });
+        // Start the discord bot
+        container.register<Client>(Client, { useValue: new DiscordBot() });
 
-        app.get('/discord-check', (req: Request, res: Response, next: NextFunction) => {
-            if (req.isAuthenticated())
-                return next()
-
-            console.error("Redirected user to front page due to cookie errors or missing osu! information. Could be anything.")
-            res.redirect('/');
-        });
-
-        passport.serializeUser((user: any, done: any) => { // Save data to session
+        // Save data to session
+        passport.serializeUser((user: any, done: any) => { 
             done(null, user);
         });
 
-        passport.deserializeUser((user: any, done: any) => { // Get data from session
+        // Get data from session
+        passport.deserializeUser((user: any, done: any) => {
             done(null, user);
         });
 
@@ -110,7 +116,7 @@ export default class Server {
         app.use(nuxt.render);
 
         app.listen(port, '0.0.0.0');
-        console.log("Listening");
+        consola.ready(`Serving verifications for ${config.name} on http://localhost:${port}/`);
     }
 }
 
