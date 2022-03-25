@@ -39,11 +39,8 @@ export class DiscordAuthentication extends AuthenticationClient {
             passReqToCallback: true
         }, (req: Request, accessToken: string, refreshToken: string, profile: Profile, cb: VerifyCallback<any>) => {
             if (!req.user)
-                return cb(new Error("User has not connected osu! account first, or cookie got lost."), null);
+                return cb(new Error("User has not connected osu! account first, or cookie got lost. Check your cookie configuration for any mistakes or errors."), null);
             else {
-                if (req.user === null)
-                    return cb(new Error("User in request is null"), null);
-
                 const o: IUser = req.user as any;
 
                 o.discord.id = profile.id;
@@ -58,8 +55,12 @@ export class DiscordAuthentication extends AuthenticationClient {
         consola.success("Discord authentication routes are registered.")
     }
 
-    private async discordJoin(userId: string, token: string, nickname: string): Promise<boolean | void> {
+    // If this returns 0 then it's successful
+    // If this returns 1 then guild member cannot join the guild (as a result of user reaching max guilds)
+    // If this returns -1 then there's some fuck up between discord api and the backend
+    private async discordJoin(userId: string, token: string, nickname: string): Promise<number> {
         consola.info(`Attemptingto join ${userId} with ${nickname} to ${this.guildId}`);
+        const client = container.resolve(Client) as DiscordBot;
         try {
             const response = await axios.put(`https://discordapp.com/api/guilds/${this.guildId}/members/${userId}`, {
                 access_token: token,
@@ -77,75 +78,31 @@ export class DiscordAuthentication extends AuthenticationClient {
             else if (response.status === 204)
                 consola.success("User already in guild");
 
-            await this.setUpUser(userId, nickname)
+            await client.setUpUser(userId, nickname);
+            return 0;
         } catch (e) {
             const error = e as AxiosError;
 
-            if (error.response === undefined)
-                return;
+            if (error.response === undefined) {
+                consola.error("Response error from Discord is invalid.")
+                return -1;
+            }
 
             // Apparently this means the user has reached max guild.
             // So handle like a valid response. 
             if (error.response.status === 400) {
-                consola.info(`${userId} has reached max guilds, attempting to add roles anyway.`);
-                const exists = await this.findGuildMember(userId);
-                if (typeof exists === 'boolean')
-                    return exists;
+                consola.info(`${userId} has reached max guilds, checking if user is present in guild...`);
+                const exists = await client.guildMemberExists(userId);
+                if (exists) {
+                    client.setUpUser(userId, nickname);
+                    return 0;
+                }
                 else
-                    this.setUpUser(userId, nickname);
+                    return 1;
             }
 
             consola.error(`An error occured while trying to join ${userId} Detailed error description: ${e}`);
-        }
-    }
-
-    private async findGuildMember(userId: string): Promise<GuildMember | boolean> {
-        const client = container.resolve<Client>(Client) as DiscordBot;
-        const guild = client.guilds.cache.get(this.guildId);
-
-        if (guild === undefined)
-            return false;
-
-        await guild.members.fetch();
-        const guildMember = guild.members.cache.get(userId);
-
-        if (guildMember === undefined) {
-            consola.info(`Guild member ${userId} not found, moving on...`);
-            return false;
-        }
-
-        return guildMember;
-    }
-
-    private async setUpUser(userId: string, nickname: string): Promise<void> {
-        const client = container.resolve<Client>(Client) as DiscordBot;
-
-        const guildMember = await this.findGuildMember(userId);
-
-        if (typeof guildMember === 'boolean')
-            return;
-
-        // TODO: make db call for the role id.
-        const role = guildMember.guild.roles.cache.find(role => role.name === 'Verified');
-
-        if (role === undefined)
-            return;
-
-        await this.changeNickName(nickname, guildMember);
-
-        if (!guildMember.roles.cache.has(role.id)) {
-            await guildMember.roles.add(role);
-            client.emit('userVerified', guildMember.guild, guildMember);
-        }
-
-        consola.success(`Verified ${guildMember.user.username} / ${userId}`);
-    }
-
-    private async changeNickName(nickname: string, member: GuildMember) {
-        try {
-            await member.setNickname(nickname, "Changed nickname to osu! username");
-        } catch (e) {
-            consola.error(e);
+            return -1;
         }
     }
 
@@ -153,13 +110,15 @@ export class DiscordAuthentication extends AuthenticationClient {
         const user = req.user as IUser;
 
         // Typescript being scuffed on overridden functions from parent class.
-        const d = container.resolve(DiscordAuthentication);
+        const d = this as DiscordAuthentication;
         const success = d.discordJoin(user.discord.id!, user.discord.token!, user.osu.displayName!);
         success.then((value) => {
-            if (typeof value === 'boolean')
+            if (value === 1)
                 res.redirect('/full');
-            else
+            else if (value === 0)
                 res.redirect('/done')
+            else
+                res.redirect('/') // TODO: flash error on the frontend.
         })
     }
 }
