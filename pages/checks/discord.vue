@@ -1,7 +1,7 @@
 <template>
   <div class="start">
     <p class="right-align">
-      Currently verifying {{ username }} ({{ osuId }})
+      Currently verifying {{ username || "" }} ({{ osuId || "" }})
       <strong>Log out?</strong>
     </p>
     <div>
@@ -18,7 +18,13 @@
         <li>
           Change the nickname on the discord server to your osu! username.
         </li>
-        <li>Add the "Verified" role to your account on the server.</li>
+        <li>Add the following roles to your account on the server:</li>
+      </ul>
+      <ul
+        v-for="role in roles"
+        :key="role"
+      >
+        <li>{{ role }}</li>
       </ul>
       <p>
         <strong>Make sure you're on the correct Discord account before
@@ -40,14 +46,20 @@ import Vue from "vue";
 
 export default Vue.extend({
   name: "VerifyStepTwo",
-  asyncData({ req }: Context) {
+  async asyncData({ req, $axios }: Context) {
+    let username = "???";
+    let osuId = "???";
+    const roles = await $axios.$get(`/api/discord-roles`);
     if (process.server) {
       const r: any = req;
-      const user: IUser = r.session.passport.user;
-      const username = user.osu.displayName || "???";
-      const osuId = user.osu.id || "???";
-      return { username, osuId };
+      if (r.session.passport !== null) {
+        const user: IUser = r.session.passport.user;
+        username = user.osu.displayName || "???";
+        osuId = user.osu.id || "???";
+        return { roles, username, osuId };
+      }
     }
+    return { roles, username, osuId };
   },
 });
 </script>
