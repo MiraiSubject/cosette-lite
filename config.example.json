@@ -11,5 +11,9 @@
                 "name": "roleName"
             }
         ]
+    },
+    "domains": ["example.com", "yoursubdomain.example.com"],
+    "dev": {
+        "https": false
     }
 }
