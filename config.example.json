@@ -3,8 +3,13 @@
     "name": "Example tournament name",
     "discord": {
         "guildId": "insert discord guild id here",
-        "welcomeIdChannel": "insert channel id to insert welcome messages",
+        "welcomeIdChannel": "insert channel id for welcome messages",
         "ownerId": "id of guild owner",
-        "roleId": "id of the role that will get assigned to verified users"
+        "roles": [
+            {
+                "id": "roleId",
+                "name": "roleName"
+            }
+        ]
     }
 }
