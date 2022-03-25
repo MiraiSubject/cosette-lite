@@ -7,6 +7,10 @@ export interface ITournamentConfig {
         ownerId: string;
         roles: ITournamentRole[];
     }
+    domains: string[];
+    dev: {
+        https: boolean
+    }
 }
 export interface ITournamentRole {
     id: string;
