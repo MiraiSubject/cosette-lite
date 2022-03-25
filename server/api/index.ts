@@ -9,12 +9,16 @@ export default class ApiRouting {
     public dbConnected: boolean = false;
     public configPath: string = '';
     private tournament: Configuration;
+    private roles: string[] = [];
 
     constructor(config?: Configuration) {
         this.addRoutes();
         if (config === undefined)
             throw new Error("Configuration file not injected");
         this.tournament = config;
+        this.tournament.config.discord.roles.forEach(role => {
+            this.roles.push(role.name);
+        });
     }
 
     private addRoutes() {
@@ -27,5 +31,9 @@ export default class ApiRouting {
             const { host, name } = t;
             return res.send({ host, name })
         });
+
+        this.router.get('/discord-roles', async (req: Request, res: Response) => {
+            res.send(this.roles);
+        })
     }
 }
