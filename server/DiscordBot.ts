@@ -38,17 +38,22 @@ export default class DiscordBot extends Client {
     public async setUpUser(userId: string, nickname: string): Promise<void> {
         try {
             const guildMember = await this.findGuildMember(userId);
+
             await this.changeNickName(nickname, guildMember);
             consola.success(`Added ${nickname} nickname to ${userId}.`)
+            
             const roles = this.tourneyConfig.discord.roles;
             const arr: string[] = [];
+
             roles.forEach((role) => {
                 arr.push(role.id);
             })
             guildMember.roles.cache.forEach((role) => {
                 arr.push(role.id);
             });
+
             consola.info(`Adding ${arr} roles to ${nickname}...`);
+
             for (let i = 0; i < arr.length; i++) {
                 if (!guildMember.roles.cache.has(roles[i].id)) {
                     try {
