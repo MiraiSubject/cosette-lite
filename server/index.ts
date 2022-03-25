@@ -20,8 +20,8 @@ import { Client } from 'discord.js';
 import DiscordBot from './DiscordBot';
 import RedisSession from './RedisSession';
 import ApiRouting from './api/index';
-import { access } from 'fs/promises';
 import Configuration from './Configuration';
+import flash from 'connect-flash';
 
 export default class Server {
     private app: Express;
@@ -77,6 +77,7 @@ export default class Server {
         app.use(helmet());
         app.use(rateLimiterMiddleware);
         app.use(bodyParser.json());
+        app.use(flash());
 
         // Inject the variables
         const configClass = container.resolve<Configuration>(Configuration);
@@ -112,7 +113,14 @@ export default class Server {
 
         if (isDev)
             await build(nuxt);
-
+        app.get('/checks/discord', (req: Request, res: Response, next: NextFunction) => {
+            if (req.isAuthenticated())
+                return next();
+            else {
+                req.flash('error', "You're not authorized to perform this action.");
+                return res.redirect('/')
+            }
+        })
         app.use(nuxt.render);
 
         app.listen(port, '0.0.0.0');
