@@ -1,14 +1,19 @@
+import config  from './config.json';
+
+let title = `${config.name} verification`;
+let description = `Verify your osu! account for ${config.name}`;
+
 export default {
   // Global page headers: https://go.nuxtjs.dev/config-head
   head: {
-    title: 'osu! Tournament Hub Verification',
+    title: title,
     htmlAttrs: {
       lang: 'en'
     },
     meta: [
       { charset: 'utf-8' },
       { name: 'viewport', content: 'width=device-width, initial-scale=1' },
-      { hid: 'description', name: 'description', content: 'Verify your account easily using your osu! and Discord accounts for access to the osu! tournament hub.' },
+      { hid: 'description', name: 'description', content: description },
       { name: 'format-detection', content: 'telephone=no' }
     ],
     link: [
@@ -24,6 +29,8 @@ export default {
   // Plugins to run before rendering page: https://go.nuxtjs.dev/config-plugins
   plugins: [
   ],
+  csp: false,
+
 
   // Auto import components: https://go.nuxtjs.dev/config-components
   components: true,
@@ -47,7 +54,9 @@ export default {
   ],
 
   // Axios module configuration: https://go.nuxtjs.dev/config-axios
-  axios: {},
+  axios: {
+    baseURL: 'http://localhost:8000', // Used as fallback if no runtime config is provided
+  },
 
   // Build Configuration: https://go.nuxtjs.dev/config-build
   build: {
