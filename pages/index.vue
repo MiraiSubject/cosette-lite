@@ -1,7 +1,7 @@
 <template>
   <div class="start">
     <div>
-      <h1>Welcome to the osu! Tournament Hub</h1>
+      <h1> Welcome to {{ tournament.name }} verification.</h1>
     </div>
     <div>
       <p>First we need to verify your account!</p>
@@ -25,7 +25,7 @@
         <li>
           Change the nickname on the discord server to your osu! username
         </li>
-        <li>Add the "Verified" role to your account on the server.</li>
+        <li>Add role(s) to your user on the server on behalf of the host.</li>
       </ul>
     </div>
     <div>
@@ -42,12 +42,37 @@
       href="/auth/osu"
       class="flex button osu"
     > Log in with osu! </a>
+    <p v-if="error !== ''" style="color:#FF4C4C; font-weight:bold; font-size: 1.2rem">{{error}}</p>
   </div>
 </template>
 <script lang="ts">
 import Vue from "vue";
-
 export default Vue.extend({
-  name: "VerifyStepOne",
+  data: () => ({}),
+  async asyncData({ req, error, $axios }) {
+    let body = {
+      error: '',
+      tournament: {}
+    };
+
+    if (process.server) {
+      const request = req as any;
+      if (request.session.flash !== undefined) {
+        console.log(request.session.flash);
+        if (request.session.flash.error !== undefined) {
+          body.error = request.session.flash.error[0];
+          request.flash("error");
+        }
+      }
+    }
+
+    try {
+      const tournament = await $axios.$get(`/api/tournament`);
+      body.tournament = tournament;
+      return body;
+    } catch (err) {
+      error({ statusCode: 404, message: `Tournament not found.` });
+    }
+  },
 });
 </script>
