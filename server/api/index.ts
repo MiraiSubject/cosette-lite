@@ -1,13 +1,13 @@
-import { Router, Request, Response } from "express";
-import { autoInjectable, inject, singleton } from "tsyringe";
+import { Request, Response, Router } from "express";
+import { autoInjectable, singleton } from "tsyringe";
 import Configuration from "../Configuration";
 
 @singleton()
 @autoInjectable()
 export default class ApiRouting {
     public readonly router: Router = Router();
-    public dbConnected: boolean = false;
-    public configPath: string = '';
+    public dbConnected = false;
+    public configPath = '';
     private tournament: Configuration;
     private roles: string[] = [];
 

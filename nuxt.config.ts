@@ -1,7 +1,7 @@
 import config  from './config.json';
 
-let title = `${config.name} verification`;
-let description = `Verify your osu! account for ${config.name}`;
+const title = `${config.name} verification`;
+const description = `Verify your osu! account for ${config.name}`;
 
 export default {
   // Global page headers: https://go.nuxtjs.dev/config-head
@@ -30,7 +30,6 @@ export default {
   plugins: [
   ],
   csp: false,
-
 
   // Auto import components: https://go.nuxtjs.dev/config-components
   components: true,

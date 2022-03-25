@@ -1,4 +1,4 @@
-import { NextFunction, Router, Request, Response } from "express";
+import { NextFunction, Request, Response, Router } from "express";
 import consola from "consola";
 import passport from "passport";
 
@@ -21,11 +21,11 @@ export abstract class AuthenticationClient {
         return str === '' || str === undefined;
     }
 
-    protected middleWare(req: Request, res: Response, next: NextFunction) {
+    protected middleWare(req: Request, res: Response, next: NextFunction): void {
         next();
     }
 
-    protected callbackMiddleWare(req: Request, res: Response, next: NextFunction) {
+    protected callbackMiddleWare(req: Request, res: Response, next: NextFunction): void {
         next();
     }
 
