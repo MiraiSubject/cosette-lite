@@ -15,7 +15,10 @@ services:
       - OSU2_CLIENT_ID=
       - OSU2_CLIENT_SECRET=
       - OSU2_CALLBACK_URL=
-      - COOKIE_SECRET=
+      - COOKIE_SECURE=1
+      - COOKIE_SECRET=keyboard_cat
+      - REDIS_HOST=redis
+      - REDIS_PORT=
     depends_on:
       - redis
   redis:
