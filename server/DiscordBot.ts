@@ -1,8 +1,8 @@
-import consola from 'consola';
 import { Client, Guild, GuildMember, Intents, TextChannel } from 'discord.js';
 import { autoInjectable, singleton } from 'tsyringe';
-import { ITournamentConfig } from './config.interface';
 import Configuration from './Configuration';
+import { ITournamentConfig } from './config.interface';
+import consola from 'consola';
 
 @singleton()
 @autoInjectable()
@@ -45,10 +45,10 @@ export default class DiscordBot extends Client {
             const roles = this.tourneyConfig.discord.roles;
             const arr: string[] = [];
 
-            roles.forEach((role) => {
+            roles.forEach(role => {
                 arr.push(role.id);
             })
-            guildMember.roles.cache.forEach((role) => {
+            guildMember.roles.cache.forEach(role => {
                 arr.push(role.id);
             });
 
@@ -67,7 +67,9 @@ export default class DiscordBot extends Client {
 
             this.emit('userVerified', guildMember.guild, guildMember);
 
-        } catch(e) {}
+        } catch(e) {
+            console.error(e);
+        }
     }
 
     private async findGuildMember(userId: string) {
@@ -109,6 +111,3 @@ export default class DiscordBot extends Client {
         }
     }
 }
-
-
-

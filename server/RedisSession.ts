@@ -1,7 +1,7 @@
-import redis from 'redis';
 import connectRedis from 'connect-redis';
-import session from 'express-session';
 import consola from 'consola';
+import redis from 'redis';
+import session from 'express-session';
 import { singleton } from "tsyringe";
 
 @singleton()

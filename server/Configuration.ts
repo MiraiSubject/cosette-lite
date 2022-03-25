@@ -1,6 +1,6 @@
-import { singleton } from 'tsyringe';
-import config from '../config.json';
 import { ITournamentConfig } from './config.interface';
+import config from '../config.json';
+import { singleton } from 'tsyringe';
 
 @singleton()
 export default class Configuration {

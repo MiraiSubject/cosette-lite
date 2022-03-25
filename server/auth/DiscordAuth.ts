@@ -1,14 +1,13 @@
+import { NextFunction, Request, Response } from 'express';
 import { Profile, Scope, Strategy, VerifyCallback } from '@oauth-everything/passport-discord';
-import { AuthenticationClient } from "./AuthenticationClient";
-import { IUser } from './IUser';
-import { Request, Response, NextFunction } from 'express';
+import axios, { AxiosError } from 'axios';
 import { container, injectable } from "tsyringe";
-import axios from 'axios';
+import { AuthenticationClient } from "./AuthenticationClient";
+import { Client } from 'discord.js';
+import DiscordBot from '../DiscordBot';
+import { IUser } from './IUser';
 import consola from "consola";
 import passport from "passport";
-import { Client, GuildMember } from 'discord.js';
-import DiscordBot from '../DiscordBot';
-import { AxiosError } from 'axios'
 
 @injectable()
 export class DiscordAuthentication extends AuthenticationClient {
@@ -106,13 +105,15 @@ export class DiscordAuthentication extends AuthenticationClient {
         }
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     protected callbackMiddleWare(req: Request, res: Response, next: NextFunction): void {
         const user = req.user as IUser;
 
         // Typescript being scuffed on overridden functions from parent class.
         const d = this as DiscordAuthentication;
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         const success = d.discordJoin(user.discord.id!, user.discord.token!, user.osu.displayName!);
-        success.then((value) => {
+        success.then(value => {
             if (value === 1)
                 res.redirect('/full');
             else if (value === 0)

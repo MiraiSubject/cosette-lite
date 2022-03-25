@@ -1,6 +1,8 @@
+/* eslint-disable sort-imports */
 import "reflect-metadata"
 import path from 'path'
 
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 import { build, loadNuxt } from 'nuxt';
 
@@ -62,13 +64,13 @@ export default class Server {
             // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             sessionOptions.cookie!.secure = !!parseInt(process.env.COOKIE_SECURE ?? '0')
         }
-        consola.info(`Cookies secure: ${sessionOptions.cookie!.secure}`);
+        consola.info(`Cookies secure: ${sessionOptions.cookie?.secure}`);
 
         // Inject the variables
         const configClass = container.resolve<Configuration>(Configuration);
         const config = configClass.config;
 
-        let allowedOrigins = ['http://localhost:8000', 'https://10.0.1.110:8000', 'http://10.0.1.110:8000', 'https://oth.mirai.gg/']
+        const allowedOrigins = ['http://localhost:8000', 'https://10.0.1.110:8000', 'http://10.0.1.110:8000', 'https://oth.mirai.gg/']
         if (config.domains.length > 0) {
             for (let i = 0; i < config.domains.length; i++) {
                 allowedOrigins.push(`http://${config.domains[i]}`);
@@ -94,9 +96,8 @@ export default class Server {
         app.use(flash());
 
         consola.info(`Allowed origins: `)
-        for (let i = 0; i < allowedOrigins.length; i++) {
+        for (let i = 0; i < allowedOrigins.length; i++) 
             console.log(`- ${allowedOrigins[i]}`);
-        }
 
         // Initialise API
         const api = container.resolve(ApiRouting);
@@ -151,9 +152,9 @@ export default class Server {
             }, app).listen(port, () => {
                 consola.ready(`Serving verifications for ${config.name} on http://localhost:${port}/`);
             });
-        } else {
+        } else 
             app.listen(port, host);
-        }
+        
     }
 }
 

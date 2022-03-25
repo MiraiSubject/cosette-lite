@@ -1,3 +1,8 @@
+export interface ITournamentRole {
+    id: string;
+    name: string;
+}
+
 export interface ITournamentConfig {
     name: string;
     host: string;
@@ -11,8 +16,4 @@ export interface ITournamentConfig {
     dev: {
         https: boolean
     }
-}
-export interface ITournamentRole {
-    id: string;
-    name: string;
 }
