@@ -5,7 +5,7 @@ import consola from 'consola';
 import { singleton } from "tsyringe";
 
 @singleton()
-export default class SessionProvider {
+export default class RedisSession {
     private redisStore: connectRedis.RedisStore;
     private redisClient: redis.RedisClient;
 
