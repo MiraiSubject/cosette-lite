@@ -18,13 +18,13 @@ Most of the code should be self-explanatory, but if parts aren't feel free to hi
 ## Configuration
 
 ### Environment
-- [Discord Developer Account & an app to use](https://discord.com/developers/applications)
+- [Discord account & an OAuth2 application and bot](https://discord.com/developers/applications)
     - Information you need:
         - Discord OAuth2 Client ID (`DISCORD_CLIENT_ID`)
         - Discord OAuth2 Client Secret (`DISCORD_CLIENT_SCRET`)
         - Discord Bot Token (`DISCORD_BOT_TOKEN`)
             - Server Member intent must be enabled too
-- [osu! OAuth2 application](https://osu.ppy.sh/home/account/edit) Scroll down to the "OAuth" section and create your app. 
+- [osu! account & an OAuth2 application](https://osu.ppy.sh/home/account/edit) Scroll down to the "OAuth" section and create your app. 
     - Information you need:
         - Client ID (`OSU2_CLIENT_ID`)
         - Client Secret (`OSU2_CLIENT_SECRET`)
@@ -41,7 +41,7 @@ In a production environment it's highly recommended to put this behind a reverse
 
 `COOKIE_SECURE` defines whether the cookie will only be available on https or http too. (0 = http, for development purposes only, 1 = https only).
 
-`COOKIE_SECRET` is the secret you provide for the cookie. Make sure this is something unique and stays consistent when deployed to production. (Refer to this SO post for more information)[https://stackoverflow.com/questions/47105436/how-and-when-do-i-generate-a-node-express-cookie-secret]
+`COOKIE_SECRET` is the secret you provide for the cookie. Make sure this is something unique and stays consistent when deployed to production. [Refer to this SO post for more information](https://stackoverflow.com/questions/47105436/how-and-when-do-i-generate-a-node-express-cookie-secret)
 
 `REDIS_HOST` & `REDIS_PORT` is the location where the redis instance is located. By default these are 127.0.0.1 and 6379 (default redis port). **If you're using the docker-compose from this repo you will only need to fill in `REDIS_HOST` with value `redis`.**
 
