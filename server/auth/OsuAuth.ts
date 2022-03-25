@@ -42,9 +42,6 @@ export class OsuAuthentication extends AuthenticationClient {
 
                 return cb(null, o);
             } else {
-                if (req.user === null)
-                    return cb(new Error("User in request is null"), null);
-
                 const o: IUser = req.user as any;
 
                 o.osu.id = `${profile.id}`;
@@ -60,13 +57,18 @@ export class OsuAuthentication extends AuthenticationClient {
         consola.success("osu! authentication routes are registered.")
     }
 
+    // You can insert your own method of checking here if you're familiar with TypeScript.
+    // This simple example checks whether a user's account is older than 6 months to prevent new account spam on the tournament hub.
+    // Alternatively you can remove everything in the body and just keep: res.redirect('/checks/discord');
     protected callbackMiddleWare(req: Request, res: Response, next: NextFunction): void {
         const now = DateTime.now().minus({ months: 6 });
         const u = req.user as IUser;
         const userJoinDate = u.osu.joinDate!;
 
+        // User is allowed to join the discord, so go to verification.
         if (now > userJoinDate) {
             res.redirect('/checks/discord');
+        // User failed verification so we redirect somewhere else for manual intervention or can customise the error.
         } else {
             u.failureReason = "osu! account is not older than 6 months yet";
             consola.info(`${u.osu.displayName} joined on ${userJoinDate} needs manual verification.`)
