@@ -21,6 +21,8 @@ import DiscordBot from './DiscordBot';
 import RedisSession from './RedisSession';
 import ApiRouting from './api/index';
 import Configuration from './Configuration';
+import https from 'https';
+import fs from 'fs';
 import flash from 'connect-flash';
 
 export default class Server {
@@ -122,10 +124,9 @@ export default class Server {
             done(null, user);
         });
 
-        const port = 8000;
-
         if (isDev)
             await build(nuxt);
+
         app.get('/checks/discord', (req: Request, res: Response, next: NextFunction) => {
             if (req.isAuthenticated())
                 return next();
@@ -133,11 +134,26 @@ export default class Server {
                 req.flash('error', "You're not authorized to perform this action.");
                 return res.redirect('/')
             }
-        })
+        });
+
         app.use(nuxt.render);
 
-        app.listen(port, '0.0.0.0');
-        consola.ready(`Serving verifications for ${config.name} on http://localhost:${port}/`);
+        // Set to 127.0.0.1 for localhost only
+        const host = '0.0.0.0';
+
+        const port = 8000;
+
+        if (config.dev.https) {
+            app.listen(8001, host);
+            https.createServer({
+                key: fs.readFileSync('./server/cert/key.pem'),
+                cert: fs.readFileSync('./server/cert/cert.pem')
+            }, app).listen(port, () => {
+                consola.ready(`Serving verifications for ${config.name} on http://localhost:${port}/`);
+            });
+        } else {
+            app.listen(port, host);
+        }
     }
 }
 

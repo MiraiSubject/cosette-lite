@@ -90,5 +90,5 @@ sw.*
 *.swp
 
 .env
-server/cert
+server/cert/*.pem
 docker-compose-live.yml
