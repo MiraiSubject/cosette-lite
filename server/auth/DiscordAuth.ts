@@ -110,7 +110,7 @@ export class DiscordAuthentication extends AuthenticationClient {
         const user = req.user as IUser;
 
         // Typescript being scuffed on overridden functions from parent class.
-        const d = this as DiscordAuthentication;
+        const d = container.resolve(DiscordAuthentication);
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         const success = d.discordJoin(user.discord.id!, user.discord.token!, user.osu.displayName!);
         success.then(value => {
