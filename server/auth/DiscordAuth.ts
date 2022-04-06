@@ -1,27 +1,34 @@
 import { NextFunction, Request, Response } from 'express';
 import { Profile, Scope, Strategy, VerifyCallback } from '@oauth-everything/passport-discord';
 import axios, { AxiosError } from 'axios';
-import { container, injectable } from "tsyringe";
+import { autoInjectable, container, injectable } from "tsyringe";
 import { AuthenticationClient } from "./AuthenticationClient";
 import { Client } from 'discord.js';
 import DiscordBot from '../DiscordBot';
 import { IUser } from './IUser';
 import consola from "consola";
 import passport from "passport";
+import Configuration from '../Configuration';
 
 @injectable()
+@autoInjectable()
 export class DiscordAuthentication extends AuthenticationClient {
     clientID = process.env.DISCORD_CLIENT_ID || '';
     clientSecret = process.env.DISCORD_CLIENT_SECRET || '';
     callbackURL = process.env.DISCORD_CALLBACK_URL || '';
     RootURL = "/discord";
-    private guildId: string = process.env.DISCORD_GUILD_ID as string || '';
+    private guildId = '';
 
-    constructor(scopes: Scope[]) {
+    constructor(scopes: Scope[], config?: Configuration) {
         super();
 
         if (!this.VarsPresent())
             return;
+
+        if (!config)
+            throw new Error("Configuration file not successfully injected.");
+
+        this.guildId = config.config.discord.guildId;
 
         if (scopes.includes(Scope.GUILDS_JOIN) && this.StrIsEmpty(this.guildId)) {
             consola.error(`Cannot use scope ${Scope.GUILDS_JOIN} when no guild id present.`);

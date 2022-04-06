@@ -13,7 +13,7 @@ export default class DiscordBot extends Client {
 
         if (!config)
             throw new Error("Configuration file not successfully injected.");
-        
+
         this.tourneyConfig = config.config;
 
         this.once('ready', () => {
@@ -25,7 +25,7 @@ export default class DiscordBot extends Client {
 
                 const channelId = this.tourneyConfig.discord.welcomeChannelId;
                 const channel = guild.channels.cache.get(channelId) as TextChannel;
-                
+
                 channel.send(`Welcome ${member} you are now verified!`)
             } catch (e) {
                 consola.error(e);
@@ -41,7 +41,7 @@ export default class DiscordBot extends Client {
 
             await this.changeNickName(nickname, guildMember);
             consola.success(`Added ${nickname} nickname to ${userId}.`)
-            
+
             const roles = this.tourneyConfig.discord.roles;
             const arr: string[] = [];
 
@@ -55,25 +55,23 @@ export default class DiscordBot extends Client {
             consola.info(`Adding ${arr} roles to ${nickname}...`);
 
             for (let i = 0; i < arr.length; i++) {
-                if (!guildMember.roles.cache.has(roles[i].id)) {
-                    try {
-                        consola.info(`Adding ${roles[i].id} to ${nickname}...`);
-                        await guildMember.roles.add(arr);
-                    } catch (e) {
-                        consola.error(`Failed to add ${roles[i].id} to ${nickname}.\nReason: ${e}`)
-                    }
+                try {
+                    consola.info(`Adding ${arr[i]} to ${nickname}...`);
+                    guildMember.roles.add(arr);
+                } catch (e) {
+                    consola.error(`Failed to add ${arr[i]} to ${nickname}.\nReason: ${e}`)
                 }
             }
 
             this.emit('userVerified', guildMember.guild, guildMember);
 
-        } catch(e) {
+        } catch (e) {
             console.error(e);
         }
     }
 
     private async findGuildMember(userId: string) {
-        const guild = this.guilds.cache.get("guildId");
+        const guild = this.guilds.cache.get(this.tourneyConfig.discord.guildId);
 
         if (guild === undefined)
             throw new Error("Invalid guild. Bot is likely not joined to the correct guild.");
@@ -96,7 +94,7 @@ export default class DiscordBot extends Client {
                 return true;
             else
                 return false;
-        } catch(e) {
+        } catch (e) {
             consola.error(e);
             return false;
         }
