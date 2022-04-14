@@ -7,7 +7,6 @@ services:
       - '8000:8000'
     environment:
       - NODE_ENV=production
-      - DISCORD_GUILD_ID=
       - DISCORD_CLIENT_ID=
       - DISCORD_CLIENT_SECRET=
       - DISCORD_CALLBACK_URL=
