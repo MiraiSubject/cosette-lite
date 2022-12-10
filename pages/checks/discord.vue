@@ -49,7 +49,7 @@ export default Vue.extend({
   async asyncData({ req, $axios }: Context) {
     let username = "???";
     let osuId = "???";
-    const roles = await $axios.$get(`/api/discord-roles`);
+    const roles = await $axios.$get(`${process.env.DOMAIN_URL}/api/discord-roles`);
     if (process.server) {
       const r: any = req;
       if (r.session.passport !== null) {

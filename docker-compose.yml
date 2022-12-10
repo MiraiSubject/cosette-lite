@@ -19,6 +19,7 @@ services:
       - COOKIE_SECRET=keyboard_cat
       - REDIS_HOST=redis
       - REDIS_PORT=
+      - DOMAIN_URL=
     depends_on:
       - redis
   redis:

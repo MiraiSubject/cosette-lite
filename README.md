@@ -45,6 +45,8 @@ In a production environment it's highly recommended to put this behind a reverse
 
 `REDIS_HOST` & `REDIS_PORT` is the location where the redis instance is located. By default these are 127.0.0.1 and 6379 (default redis port). **If you're using the docker-compose from this repo you will only need to fill in `REDIS_HOST` with value `redis`.**
 
+`DOMAIN_URL` is for when running behind a docker container and API can't be called via localhost on default port. Leave empty if doesn't apply.
+
 Refer to the `.env.example` file for these and other variables that may be needed. (Don't forget to rename it to `.env` to be able to use it)
 
 ### Tournament

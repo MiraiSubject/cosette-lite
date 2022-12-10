@@ -67,7 +67,7 @@ export default Vue.extend({
     }
 
     try {
-      const tournament = await $axios.$get(`/api/tournament`);
+      const tournament = await $axios.$get(`${process.env.DOMAIN_URL}/api/tournament`);
       body.tournament = tournament;
       return body;
     } catch (err) {
