@@ -39,11 +39,11 @@ export class OsuAuthentication extends AuthenticationClient {
                         joinDate: DateTime.fromISO(profile._json.join_date)
                     }
                 }
-                consola.log(o)
+
                 return cb(null, o);
             } else {
                 const o: IUser = req.user as any;
-                consola.log(o)
+
                 o.osu.id = `${profile.id}`;
                 o.osu.token = _accessToken;
                 o.osu.displayName = profile.displayName;
@@ -66,7 +66,6 @@ export class OsuAuthentication extends AuthenticationClient {
         const u = req.user as IUser;
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         const userJoinDate = u.osu.joinDate!;
-        consola.log(now)
 
         // User is allowed to join the discord, so go to verification.
         if (now > userJoinDate) 
