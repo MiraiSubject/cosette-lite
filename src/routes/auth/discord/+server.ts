@@ -22,8 +22,7 @@ function getOAuthUrl() {
 
 // Write cookie for the state which will be used to compare later for the linked role stuff.
 export const GET = (async ({ locals }) => {
-
-    if (!locals.session.data.osu?.id || locals.session.data.osu.username) {
+    if (!(locals.session.data.osu?.id || locals.session.data.osu?.username)) {
         locals.session.set({
             error: "Error saving data to cookie, please delete the cookies for this site and clear the cache."
         });
