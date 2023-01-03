@@ -6,10 +6,11 @@
 </script>
 
 <div class="start">
-	<p class="right-align">
-		Currently verifying {data.username || ''} ({data.osuId || ''})
-		<strong>Log out?</strong>
-	</p>
+	<div class="user-info">
+		<p class="right-align">
+			Currently verifying {data.username || ''} ({data.osuId || ''}). <a href="/logout"><strong>Log out?</strong></a>
+		</p>
+	</div>
 	<div>
 		<h1>Connect your Discord account</h1>
 	</div>
