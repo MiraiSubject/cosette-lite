@@ -80,3 +80,4 @@ server/cert/*.pem
 docker-compose-live.yml
 .svelte-kit
 build/
+config.json
