@@ -1,0 +1,19 @@
+{
+    "host": "Example Host",
+    "name": "Example tournament name",
+    "discord": {
+        "guildId": "insert discord guild id here",
+        "welcomeChannelId": "insert channel id for welcome messages",
+        "ownerId": "id of guild owner",
+        "roles": [
+            {
+                "id": "roleId",
+                "name": "roleName"
+            }
+        ]
+    },
+    "domains": ["example.com", "yoursubdomain.example.com"],
+    "dev": {
+        "https": false
+    }
+}

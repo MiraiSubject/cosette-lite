@@ -1,7 +1,0 @@
-{
-    "files.exclude": {
-        ".env": false,
-        "node_modules": true,
-        ".nuxt": true
-    }
-}
