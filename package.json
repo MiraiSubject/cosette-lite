@@ -43,6 +43,5 @@
 		"svelte-kit-cookie-session": "^3.3.2",
 		"ts-node": "^10.9.1",
 		"tsyringe": "^4.7.0"
-	},
-	"packageManager": "yarn@1.22.19"
+	}
 }
