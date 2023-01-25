@@ -12,8 +12,4 @@ export interface ITournamentConfig {
         ownerId: string;
         roles: ITournamentRole[];
     }
-    domains: string[];
-    dev: {
-        https: boolean
-    }
 }
