@@ -1,11 +1,14 @@
 <script lang="ts">
+	import type { ITournamentConfig } from '$lib/config.interface';
 	import type { PageData } from './$types';
+
 	export let data: PageData;
+	export let config: ITournamentConfig = data.config;
 </script>
 
 <div class="start">
 	<div>
-		<h1>Welcome to {data.name} verification.</h1>
+		<h1>Welcome to {config.name} verification.</h1>
 	</div>
 	<div>
 		<p>First we need to verify your account!</p>
@@ -34,5 +37,8 @@
 		<p>By proceeding you will agree to the <strong>functional</strong> use of cookies.</p>
 	</div>
 	<a href="/auth/osu" class="flex button osu"> Log in with osu! </a>
+	{#if data.error}
+		<p style="color:#FF4C4C; font-weight:bold; font-size: 1.2rem">{data.error}</p>
+	{/if}
 	<!-- <p v-if="error !== ''" style="color:#FF4C4C; font-weight:bold; font-size: 1.2rem">{{error}}</p> -->
 </div>

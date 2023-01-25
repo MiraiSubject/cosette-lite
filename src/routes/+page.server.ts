@@ -1,20 +1,14 @@
-import type { ITournamentConfig } from '$lib/config.interface';
-import { readFile } from 'fs/promises';
 import type { PageServerLoad } from './$types';
+ 
+console.log("Index page gets loaded")
 
 export const load = (async ({ locals }) => {
-  const res: ITournamentConfig = JSON.parse(await readFile('./config.json', 'utf-8'));
-
-  const output: {
-    name: string,
-    session?: SessionData
-  } = {
-    name: res.name
+  if (locals.session.data.error) {
+    return {
+      error: locals.session.data.error
+    }
   }
-
-  if (locals.session) {
-    output.session = locals.session.data
-  }
-
-  return output;
+  // return {
+  //   name: "osu! Tournament Hub",
+  // };
 }) satisfies PageServerLoad;

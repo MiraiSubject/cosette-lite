@@ -1,8 +1,9 @@
 <script lang="ts">
+	import type { ITournamentConfig } from '$lib/config.interface';
 	import type { PageData } from './$types';
 
 	export let data: PageData;
-	export let roles = data.roles!;
+	export let config: ITournamentConfig = data.config;
 </script>
 
 <div class="start">
@@ -23,8 +24,8 @@
 			<li>Add the following roles to your account on the server:</li>
 		</ul>
 		<ul>
-			{#each roles as role}
-				<li>{role}</li>
+			{#each config.discord.roles as role}
+				<li>{role.name}</li>
 			{/each}
 		</ul>
 		<p>
