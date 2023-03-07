@@ -56,13 +56,31 @@ export const GET = (async ({ url, locals }) => {
         const tokens = await getOAuthTokens(code);
         const meData = await getUserData(tokens);
 
+        const joinDate = DateTime.fromISO(meData.join_date)
+
         await locals.session.set({
             osu: {
                 id: meData.id,
                 username: meData.username,
-                joinDate: DateTime.fromISO(meData.join_date)
+                joinDate
             }
         });
+
+        const nowMinus6Months = DateTime.now().minus({ months: 6 });
+
+        if (nowMinus6Months > joinDate) {
+            await locals.session.update((data) => {
+                data.error = `osu! account is not older than 6 months yet (account age is ${joinDate.toISODate()})`
+                return data;
+            });
+
+            return new Response(null, {
+                status: 302,
+                headers: {
+                    location: "/checks/manual"
+                }
+            })
+        }
 
         return new Response(null, {
             status: 302,
