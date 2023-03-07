@@ -3,6 +3,8 @@ import { PUBLIC_DISCORD_CALLBACK_URL } from '$env/static/public';
 import { redirect } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { config } from '../../../../../../../packages/config/config';
+import got from 'got';
+import { BotResult } from '$lib/BotResult';
 
 async function getOAuthTokens(code: string) {
     const url = 'https://discord.com/api/v10/oauth2/token';
@@ -71,7 +73,7 @@ interface User {
     public_flags: number;
 }
 
-async function joinDiscordServer(user: User, token: string, nickname: string): Promise<number> {
+async function joinDiscordServer(user: User, token: string, nickname: string): Promise<BotResult> {
     try {
         const response = await fetch(`https://discord.com/api/guilds/${config.discord.guildId}/members/${user.id}`, {
             body: JSON.stringify({
@@ -93,22 +95,37 @@ async function joinDiscordServer(user: User, token: string, nickname: string): P
                 break;
             case 400: {
                 console.log(`${user.id} - ${user.username} has reached maximum guilds, checking if user is present in guild...`);
-                //tRPC call to check whether guildmember exists
-                const exists = true;
+
+                const exists = await got.get("unix:/tmp/discordbot.sock:/api/guildmemberexists", {
+                    enableUnixSockets: true,
+                    searchParams: {
+                        guildId: config.discord.guildId,
+                        userId: user.id
+                    }
+                });
+
                 if (exists) {
                     break;
                 } else {
-                    return 1;
+                    return BotResult.Full;
                 }
             }
         }
 
-        // Perform IPC (or tRPC) request to bot to add roles
+        await got.post("unix:/tmp/discordbot.sock:/api/setupuser", {
+            enableUnixSockets: true,
+            json: {
+                userId: user.id,
+                nickname,
+            }
+        });
+
+        return BotResult.Success;
     } catch (e) {
         console.log(e);
+        return BotResult.Error;
     }
 }
-
 
 // Write cookie for the state which will be used to compare later for the linked role stuff.
 export const GET = (async ({ url, locals }) => {
@@ -134,7 +151,15 @@ export const GET = (async ({ url, locals }) => {
 
     const meData: DiscordData = await getUserData(tokens);
 
-    await joinDiscordServer(meData.user, tokens.access_token, locals.session.data.osu?.username || '');
+    const result: BotResult = await joinDiscordServer(meData.user, tokens.access_token, locals.session.data.osu?.username || '');
+    
+    if (result === BotResult.Full) {
+        locals.session.data.error = "You have joined the maxmium amount of servers. Please leave a server before trying to rejoin this one."
+        return Response.redirect('/');
+    } else if (result === BotResult.Error) {
+        locals.session.data.error = "An unknown error occured while trying to join the server."
+        return Response.redirect('/');
+    }
 
     console.log(`Discord User joined: ${meData.user.id} - ${meData.user.username}`);
 
