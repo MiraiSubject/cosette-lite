@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { ITournamentConfig } from '$lib/config.interface';
+	import type { ITournamentConfig } from "config";
 	import type { PageData } from './$types';
 
 	export let data: PageData;
@@ -40,5 +40,4 @@
 	{#if data.error}
 		<p style="color:#FF4C4C; font-weight:bold; font-size: 1.2rem">{data.error}</p>
 	{/if}
-	<!-- <p v-if="error !== ''" style="color:#FF4C4C; font-weight:bold; font-size: 1.2rem">{{error}}</p> -->
 </div>
