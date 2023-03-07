@@ -1,5 +1,5 @@
 {
-	"name": "oth-svelte",
+	"name": "svelte-full-stack",
 	"version": "0.0.1",
 	"private": true,
 	"scripts": {
@@ -33,16 +33,14 @@
 	},
 	"type": "module",
 	"dependencies": {
-		"@fastify/helmet": "^10.1.0",
-		"@fastify/rate-limit": "^7.6.0",
 		"@sveltejs/adapter-node": "^1.0.0",
+		"@types/luxon": "^3.2.0",
 		"@types/node": "^18.11.17",
-		"discord.js": "^14.7.1",
-		"fastify": "^4.10.2",
+		"config": "workspace:*",
+		"got": "^12.6.0",
+		"luxon": "^3.3.0",
 		"redis": "^4.5.1",
 		"svelte-kit-cookie-session": "^3.3.2",
-		"ts-node": "^10.9.1",
-		"tsyringe": "^4.7.0",
-		"config": "workspace:*"
+		"ts-node": "^10.9.1"
 	}
 }
