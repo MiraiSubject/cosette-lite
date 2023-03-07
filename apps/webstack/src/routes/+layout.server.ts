@@ -1,5 +1,5 @@
 import type { LayoutServerLoad } from './$types';
-import { config } from '$lib/config'
+import { config } from "config"
 
 export const load = (async ({ locals }) => {
 

@@ -1,4 +1,4 @@
-import type { ITournamentConfig } from "$lib/config.interface";
+import type { ITournamentConfig } from "./config.interface";
 
 export const config: ITournamentConfig = {
     "host": "Example Host",
