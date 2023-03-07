@@ -2,7 +2,7 @@ import { DISCORD_BOT_TOKEN, DISCORD_CLIENT_ID, DISCORD_CLIENT_SECRET } from '$en
 import { PUBLIC_DISCORD_CALLBACK_URL } from '$env/static/public';
 import { redirect } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
-import { config } from '$lib/config';
+import { config } from '../../../../../../../packages/config/config';
 
 async function getOAuthTokens(code: string) {
     const url = 'https://discord.com/api/v10/oauth2/token';
