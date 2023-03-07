@@ -2,6 +2,7 @@ import { OSU2_CLIENT_SECRET } from '$env/static/private';
 import { PUBLIC_OSU2_CALLBACK_URL, PUBLIC_OSU2_CLIENT_ID } from '$env/static/public';
 import { redirect } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
+import { DateTime } from "luxon";
 
 async function getOAuthTokens(code: string) {
     const url = 'https://osu.ppy.sh/oauth/token';
@@ -54,11 +55,12 @@ export const GET = (async ({ url, locals }) => {
         if (!code) throw new Error('No code provided');
         const tokens = await getOAuthTokens(code);
         const meData = await getUserData(tokens);
-        
+
         await locals.session.set({
             osu: {
                 id: meData.id,
                 username: meData.username,
+                joinDate: DateTime.fromISO(meData.join_date)
             }
         });
 
