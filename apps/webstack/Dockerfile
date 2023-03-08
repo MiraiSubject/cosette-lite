@@ -34,5 +34,5 @@ FROM builder as runner
 ENV PORT 8000
 WORKDIR /app/apps/webstack
 RUN mv .env .env.example
-VOLUME [ "/tmp/gg.mirai.oth.discordbot-api.sock" ]
+# VOLUME [ "/tmp/gg.mirai.oth.discordbot-api.sock" ]
 CMD ["pnpm", "start"]
