@@ -22,5 +22,5 @@ WORKDIR /app
 COPY --from=pruner /app/out/full/ /app
 COPY --from=installer /app .
 WORKDIR /app/apps/discordbot
-VOLUME [ "/tmp/gg.mirai.oth.discordbot-api.sock" ]
+# VOLUME [ "/tmp/gg.mirai.oth.discordbot-api.sock" ]
 CMD ["pnpm", "start"]
