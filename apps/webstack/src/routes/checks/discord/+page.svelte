@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { ITournamentConfig } from '$lib/config.interface';
+	import type { ITournamentConfig } from 'config';
 	import type { PageData } from './$types';
 
 	export let data: PageData;
