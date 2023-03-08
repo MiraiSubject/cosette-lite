@@ -124,3 +124,5 @@ Important migration notes:
   - Workaround: modify the fastify server to create an http server and point the web application to the same URLs. Make sure to properly configure your firewall and/or secure the endpoints if you're going this route.
 
 Any custom modifications made in the Nuxt application will be lost and have to be rewritten using Svelte. Style modifications can easily be migrated if you only lightly modified your instance.
+
+If for any reason you'd like to reference the old Nuxt version of this application you can do so [here](https://github.com/MiraiSubject/oth-verification/tree/nuxt-2).
