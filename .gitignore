@@ -82,3 +82,4 @@ server/cert/*.pem
 build/
 config.json
 *out
+docker-compose-staging.yml
