@@ -77,7 +77,8 @@ sw.*
 */.env
 */.env.backup
 server/cert/*.pem
-*/docker-compose-live.yml
+*docker-compose-live.yml
 .svelte-kit
 build/
 config.json
+*out
