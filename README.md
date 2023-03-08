@@ -30,6 +30,7 @@ Rename `.env.example` to `.env` and fill in the following information:
         - Manage Roles
         - Manage Nicknames
         - Create Invite
+      - Example of an invite link with the right permissions: https://discord.com/api/oauth2/authorize?client_id=YOURBOTSAPPLICATIONID&permissions=402653185&scope=bot
 - [osu! account & an OAuth2 application](https://osu.ppy.sh/home/account/edit) Scroll down to the "OAuth" section and create your app. 
     - Information you need:
         - Client ID (`PUBLIC_OSU2_CLIENT_ID`)
