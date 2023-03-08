@@ -1,6 +1,12 @@
 **/node_modules
+.env
+./apps/webstack/.env
+./apps/discordbot/.env
 out
+**/build
+**/.svelte-kit
 **/Dockerfile
+docker-compose-live.yml
 build-bot.sh
 build-web.sh
 .npmrc
