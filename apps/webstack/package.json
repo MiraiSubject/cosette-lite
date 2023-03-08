@@ -40,7 +40,6 @@
 		"dotenv": "^16.0.3",
 		"got": "^12.6.0",
 		"luxon": "^3.3.0",
-		"redis": "^4.5.1",
 		"svelte-kit-cookie-session": "^3.3.2",
 		"ts-node": "^10.9.1"
 	}
