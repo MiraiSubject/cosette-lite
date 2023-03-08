@@ -4,7 +4,7 @@ This is a full-stack application built using [SvelteKit](https://kit.svelte.dev)
 
 It is relatively easy to adapt for your own tournament and discord server, with minimum modifications. Some basic knowledge of Typescript, Svelte and Docker may be required to successfully deploy an instance of this projetc.
 
-Most of the code should be self-explanatory, but if parts aren't feel free to hit me up in the tournament hub discord, or open an issue here.
+Most of the code should be self-explanatory, but if parts aren't feel free to hit me up in the tournament hub Discord, or open an issue here.
 
 ## Requirements
 - *nix-based OS (macOS, Linux, WSL 2 on Windows) **Native Windows is not supported**
@@ -25,7 +25,11 @@ Rename `.env.example` to `.env` and fill in the following information:
   - Discord OAuth2 Client ID (`PUBLIC_DISCORD_CLIENT_ID`)
   - Discord OAuth2 Client Secret (`DISCORD_CLIENT_SECRET`)
   - Discord Bot Token (`DISCORD_BOT_TOKEN`)
-      - Server Member intent must be enabled too
+      - Server Member intent must be enabled
+      - Required permissions:
+        - Manage Roles
+        - Manage Nicknames
+        - Create Invite
 - [osu! account & an OAuth2 application](https://osu.ppy.sh/home/account/edit) Scroll down to the "OAuth" section and create your app. 
     - Information you need:
         - Client ID (`PUBLIC_OSU2_CLIENT_ID`)
@@ -47,14 +51,14 @@ In a production environment it's highly recommended to put this behind a reverse
 
 Go to `packages/config/config.ts` and modify the fields accordingly: 
 
-- Host: the host of the tournament, preferrably their osu! username for clarity. This can also be the owner of the discord server if this is not a tournament.
-- Name: the name of the tournament or discord server
+- Host: the host of the tournament, preferrably their osu! username for clarity. This can also be the owner of the Discord server if this is not a tournament.
+- Name: the name of the tournament or Discord server
   
-- Discord: You will need to enable developer mode in your discord client to be able to fill these fields in.
-  - guildId: the value you get from Copy ID when you right click on the server icon.
-  - welcomeChannelId: the channel id of where the bot can send welcome messages to confirm a successful entry for the user.
+- Discord: You will need to enable developer mode in your Discord client to be able to fill these fields in.
+  - guildId: the guild where people get joined to by the application
+  - welcomeChannelId: the channel where the bot can send welcome messages to confirm a successful entry for the user.
   - ownerId: unused.
-  - roles: a list of roles you want give to the user in the following format: (make sure your instance of the bot can modify roles)
+  - roles: a list of roles you want give to the user in the following format:
     ```json
     {
         "id": "role id from your client",
@@ -98,9 +102,9 @@ To test production locally do `pnpm build` and then `pnpm start` to start a prod
 
 Convenience scripts are present to build Docker images for both components of the repo (`build-bot.sh` & `build-web.sh`). There is also an example `docker-compose` file present.
 
-If building on an ARM based system and deploy to Intel/AMD-based systems you will need to use something like:
+If you're building on an ARM based system and intend to deploy to an Intel/AMD-based systems you will need to add `--platform linux/amd64` to the build command, for example:
 
-`docker build --platform linux/amd64 --tag oth-verification .`
+`docker build --platform linux/amd64 --tag othbot .`
 
 to build it for the correct architecture. [Refer to the Docker documentation for more information](https://docs.docker.com/build/building/multi-platform/). Obviously don't use this command if you're already building on an Intel/AMD-based system and intend to deploy on another Intel/AMD-based system.
 
@@ -115,7 +119,7 @@ Some important notes regarding the `config.json`:
 Important migration notes: 
 - pnpm is now the chosen package manager due to the project becoming a monorepo with two components.
 - turborepo (`turbo`) is now a requirement for the same aforementioned reason
-- Native Windows is not supported anymore due to the usage of Unix Sockets for communication between the discord bot and the web application.
+- Native Windows is not supported anymore due to the usage of Unix Sockets for communication between the Discord bot and the web application.
   - Workaround: modify the fastify server to create an http server and point the web application to the same URLs. Make sure to properly configure your firewall and/or secure the endpoints if you're going this route.
 
 Any custom modifications made in the Nuxt application will be lost and have to be rewritten using Svelte. Style modifications can easily be migrated if you only lightly modified your instance.
