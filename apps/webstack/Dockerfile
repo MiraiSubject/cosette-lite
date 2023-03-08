@@ -28,6 +28,7 @@ RUN turbo build --scope=webstack
 
 
 FROM builder as runner
+ENV PORT 8000
 WORKDIR /app/apps/webstack
 VOLUME [ "/tmp/gg.mirai.oth.discordbot-api.sock" ]
 CMD ["pnpm", "start"]
