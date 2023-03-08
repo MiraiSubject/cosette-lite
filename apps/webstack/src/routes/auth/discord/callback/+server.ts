@@ -1,6 +1,5 @@
-import { PUBLIC_DISCORD_CLIENT_ID } from '$env/static/public'
-import { DISCORD_BOT_TOKEN, DISCORD_CLIENT_SECRET } from '$env/static/private';
-import { PUBLIC_DISCORD_CALLBACK_URL } from '$env/static/public';
+import { env } from '$env/dynamic/private';
+import { env as pubEnv } from '$env/dynamic/public';
 import { redirect } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { config } from '../../../../../../../packages/config/config';
@@ -10,11 +9,11 @@ import { BotResult } from '$lib/BotResult';
 async function getOAuthTokens(code: string) {
     const url = 'https://discord.com/api/v10/oauth2/token';
     const body = new URLSearchParams({
-        client_id: `${PUBLIC_DISCORD_CLIENT_ID}`,
-        client_secret: `${DISCORD_CLIENT_SECRET}`,
+        client_id: `${pubEnv.PUBLIC_DISCORD_CLIENT_ID}`,
+        client_secret: `${env.DISCORD_CLIENT_SECRET}`,
         grant_type: 'authorization_code',
         code,
-        redirect_uri: `${PUBLIC_DISCORD_CALLBACK_URL}`,
+        redirect_uri: `${pubEnv.PUBLIC_DISCORD_CALLBACK_URL}`,
     });
 
     const response = await fetch(url, {
@@ -83,7 +82,7 @@ async function joinDiscordServer(user: User, token: string, nickname: string): P
             method: 'POST',
             headers: {
                 "Content-Type": "application/json",
-                "Authorization": `Bot ${DISCORD_BOT_TOKEN}`
+                "Authorization": `Bot ${env.DISCORD_BOT_TOKEN}`
             },
         });
 

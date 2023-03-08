@@ -1,5 +1,5 @@
-import { OSU2_CLIENT_SECRET } from '$env/static/private';
-import { PUBLIC_OSU2_CALLBACK_URL, PUBLIC_OSU2_CLIENT_ID } from '$env/static/public';
+import { env } from '$env/dynamic/private';
+import { env as pubEnv } from '$env/dynamic/public';
 import { redirect } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { DateTime } from "luxon";
@@ -7,11 +7,11 @@ import { DateTime } from "luxon";
 async function getOAuthTokens(code: string) {
     const url = 'https://osu.ppy.sh/oauth/token';
     const body = JSON.stringify({
-        client_id: `${PUBLIC_OSU2_CLIENT_ID}`,
-        client_secret: `${OSU2_CLIENT_SECRET}`,
+        client_id: `${pubEnv.PUBLIC_OSU2_CLIENT_ID}`,
+        client_secret: `${env.OSU2_CLIENT_SECRET}`,
         grant_type: 'authorization_code',
         code,
-        redirect_uri: `${PUBLIC_OSU2_CALLBACK_URL}`,
+        redirect_uri: `${pubEnv.PUBLIC_OSU2_CALLBACK_URL}`,
     });
 
     const response = await fetch(url, {

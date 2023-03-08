@@ -1,6 +1,5 @@
 import type { RequestHandler } from './$types';
-import { PUBLIC_DISCORD_CLIENT_ID } from '$env/static/public';
-import { PUBLIC_DISCORD_CALLBACK_URL } from '$env/static/public';
+import { env as pubEnv } from '$env/dynamic/public';
 import { redirect } from '@sveltejs/kit';
 
 /**
@@ -11,8 +10,8 @@ function getOAuthUrl() {
     const state = crypto.randomUUID();
 
     const url = new URL('https://discord.com/api/oauth2/authorize');
-    url.searchParams.set('client_id', `${PUBLIC_DISCORD_CLIENT_ID}`);
-    url.searchParams.set('redirect_uri', `${PUBLIC_DISCORD_CALLBACK_URL}`);
+    url.searchParams.set('client_id', `${pubEnv.PUBLIC_DISCORD_CLIENT_ID}`);
+    url.searchParams.set('redirect_uri', `${pubEnv.PUBLIC_DISCORD_CALLBACK_URL}`);
     url.searchParams.set('response_type', 'code');
     url.searchParams.set('state', state);
     url.searchParams.set('scope', 'role_connections.write identify');
