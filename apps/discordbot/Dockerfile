@@ -1,25 +1,26 @@
-FROM node:lts-alpine AS builder
-RUN apk add --no-cache libc6-compat
+# Prepare turborepo
+FROM node:lts-alpine AS base
 RUN apk update
-WORKDIR /app
+RUN apk add --no-cache libc6-compat
 RUN npm i -g pnpm turbo
-COPY . /app
+
+FROM base as pruner
+WORKDIR /app
+COPY . .
 RUN turbo prune --scope=discordbot --docker
 
-FROM builder AS dependencies
+FROM base AS installer
 # First install the dependencies (as they change less often)
 WORKDIR /app
-COPY --from=builder /app/out/json/ .
-COPY --from=builder /app/out/pnpm-lock.yaml ./pnpm-lock.yaml
+COPY .gitignore .gitignore
+COPY --from=pruner /app/out/json/ .
+COPY --from=pruner /app/out/pnpm-lock.yaml ./pnpm-lock.yaml
 RUN pnpm install
-COPY --from=builder /app/out/full/ /app
 
-
-FROM node:lts-alpine as runner
+FROM base as runner
 WORKDIR /app
-COPY --from=dependencies /app .
-RUN npm i -g pnpm
-COPY --from=dependencies . /app
+COPY --from=pruner /app/out/full/ /app
+COPY --from=installer /app .
 WORKDIR /app/apps/discordbot
 VOLUME [ "/tmp/gg.mirai.oth.discordbot-api.sock" ]
 CMD ["pnpm", "start"]
