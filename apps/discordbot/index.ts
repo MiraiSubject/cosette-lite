@@ -45,10 +45,14 @@ fastify.post('/api/setupuser', { schema }, async (request: FastifyRequest, reply
 
 
 const start = async () => {
+
+    // Remove socket file if it exists. Could be made cleaner by just cleaning up the file on exit.
     try {
-        //await fastify.listen({ host: '0.0.0.0', port: 3000 });
-        fs.unlinkSync('/tmp/discordbot.sock');
-        await fastify.listen({ path: '/tmp/discordbot.sock' })
+        fs.unlinkSync('/tmp/gg.mirai.oth.discordbot-api.sock');
+    } catch {}
+
+    try {
+        await fastify.listen({ path: '/tmp/gg.mirai.oth.discordbot-api.sock' })
     } catch (err) {
         fastify.log.error(err)
         process.exit(1)
