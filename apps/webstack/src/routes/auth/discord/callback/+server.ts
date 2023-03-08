@@ -96,7 +96,7 @@ async function joinDiscordServer(user: User, token: string, nickname: string): P
             case 400: {
                 console.log(`${user.id} - ${user.username} has reached maximum guilds, checking if user is present in guild...`);
 
-                const exists = await got.get("unix:/tmp/discordbot.sock:/api/guildmemberexists", {
+                const exists = await got.get("unix:/tmp/gg.mirai.oth.discordbot-api.sock:/api/guildmemberexists", {
                     enableUnixSockets: true,
                     searchParams: {
                         guildId: config.discord.guildId,
@@ -112,7 +112,7 @@ async function joinDiscordServer(user: User, token: string, nickname: string): P
             }
         }
 
-        await got.post("unix:/tmp/discordbot.sock:/api/setupuser", {
+        await got.post("unix:/tmp/gg.mirai.oth.discordbot-api.sock:/api/setupuser", {
             enableUnixSockets: true,
             json: {
                 userId: user.id,
