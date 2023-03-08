@@ -1,0 +1,33 @@
+version: '3'
+services:
+  cosette-lite:
+    restart: always
+    build:
+      context: .
+      dockerfile: ./apps/webstack/Dockerfile
+    ports:
+      - '8000:8000'
+    environment:
+      NODE_ENV: production
+      PUBLIC_DISCORD_CLIENT_ID:
+      DISCORD_CLIENT_SECRET:
+      PUBLIC_DISCORD_CALLBACK_URL:
+      DISCORD_GUILD_ID:
+      DISCORD_BOT_TOKEN:
+      PUBLIC_OSU2_CLIENT_ID:
+      OSU2_CLIENT_SECRET:
+      PUBLIC_OSU2_CALLBACK_URL:
+      PRIVATE_COOKIE_SECRET:
+    volumes:
+      - bot-socket:/tmp
+  cosette-bot:
+    restart: always
+    build:
+      context: .
+      dockerfile: ./apps/discordbot/Dockerfile
+    environment:
+      DISCORD_BOT_TOKEN:
+    volumes:
+      - bot-socket:/tmp
+volumes:
+  bot-socket:
