@@ -5,6 +5,11 @@
 	export let data: PageData;
 	export let config: ITournamentConfig = data.config;
 </script>
+<svelte:head>
+	<meta property="og:title" content="{config.name} verification" />
+	<meta property="og:type" content="website" />
+	<meta property="og:description" content="Verify your account easily using your osu! and Discord accounts for access to {config.name}." />
+</svelte:head>
 
 <div class="start">
 	<div>
