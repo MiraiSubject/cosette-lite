@@ -1,8 +1,8 @@
 import { handleSession } from 'svelte-kit-cookie-session';
-import { PRIVATE_COOKIE_SECRET } from '$env/static/private'
+import { env } from '$env/dynamic/private'
 
 export const first = handleSession({
-	secret: `${PRIVATE_COOKIE_SECRET}`
+	secret: `${env.PRIVATE_COOKIE_SECRET}`
 });
 
 export const handle = first

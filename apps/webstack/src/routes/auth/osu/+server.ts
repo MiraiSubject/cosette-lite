@@ -1,4 +1,4 @@
-import { PUBLIC_OSU2_CALLBACK_URL, PUBLIC_OSU2_CLIENT_ID } from '$env/static/public';
+import { env as pubEnv } from '$env/dynamic/public';
 import type { RequestHandler } from './$types';
 
 /**
@@ -7,8 +7,8 @@ import type { RequestHandler } from './$types';
  */
 function getOAuthUrl() {
     const url = new URL('https://osu.ppy.sh/oauth/authorize');
-    url.searchParams.set('client_id', `${PUBLIC_OSU2_CLIENT_ID}`);
-    url.searchParams.set('redirect_uri', `${PUBLIC_OSU2_CALLBACK_URL}`);
+    url.searchParams.set('client_id', `${pubEnv.PUBLIC_OSU2_CLIENT_ID}`);
+    url.searchParams.set('redirect_uri', `${pubEnv.PUBLIC_OSU2_CALLBACK_URL}`);
     url.searchParams.set('response_type', 'code');
     url.searchParams.set('scope', 'identify');
     return url.toString();
