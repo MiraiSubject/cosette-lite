@@ -1,3 +1,6 @@
 **/node_modules
 out
 **/Dockerfile
+build-bot.sh
+build-web.sh
+.npmrc
