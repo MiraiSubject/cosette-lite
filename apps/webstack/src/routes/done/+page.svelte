@@ -9,7 +9,7 @@
 
 <div class="start">
 	<div>
-		<h1>Welcome to the {config.name}</h1>
+		<h1>Welcome to {config.name}</h1>
 	</div>
 	<div>
 		<p>Your account is now verified. Welcome to the server!</p>
