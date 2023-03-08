@@ -1,15 +1,15 @@
 import type { ITournamentConfig } from "./config.interface";
 
 export const config: ITournamentConfig = {
-    "host": "Example Host",
-    "name": "Example tournament name",
+    "host": "Mirai Subject",
+    "name": "osu! Tournament Hub",
     "discord": {
-        "guildId": "insert discord guild id here",
-        "welcomeChannelId": "insert channel id for welcome messages",
-        "ownerId": "id of guild owner",
+        "guildId": "315235342447935491",
+        "welcomeChannelId": "931251476297297930",
+        "ownerId": "119142790537019392",
         "roles": [
             {
-                "id": "roleId",
+                "id": "315242280019689484",
                 "name": "Verified"
             }
         ]
