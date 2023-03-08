@@ -24,11 +24,15 @@ FROM base as builder
 WORKDIR /app
 COPY --from=pruner /app/out/full/ .
 COPY --from=installer /app .
+WORKDIR /app/apps/webstack
+RUN mv .env.example .env
+WORKDIR /app
 RUN turbo build --scope=webstack
 
 
 FROM builder as runner
 ENV PORT 8000
 WORKDIR /app/apps/webstack
+RUN mv .env .env.example
 VOLUME [ "/tmp/gg.mirai.oth.discordbot-api.sock" ]
 CMD ["pnpm", "start"]

@@ -22,7 +22,7 @@ Most of the code should be self-explanatory, but if parts aren't feel free to hi
 Rename `.env.example` to `.env` and fill in the following information:
 
 - [Discord account & an OAuth2 application and bot](https://discord.com/developers/applications)
-  - Discord OAuth2 Client ID (`DISCORD_CLIENT_ID`)
+  - Discord OAuth2 Client ID (`PUBLIC_DISCORD_CLIENT_ID`)
   - Discord OAuth2 Client Secret (`DISCORD_CLIENT_SECRET`)
   - Discord Bot Token (`DISCORD_BOT_TOKEN`)
       - Server Member intent must be enabled too

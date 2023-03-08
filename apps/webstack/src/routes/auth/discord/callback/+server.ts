@@ -1,4 +1,5 @@
-import { DISCORD_BOT_TOKEN, DISCORD_CLIENT_ID, DISCORD_CLIENT_SECRET } from '$env/static/private';
+import { PUBLIC_DISCORD_CLIENT_ID } from '$env/static/public'
+import { DISCORD_BOT_TOKEN, DISCORD_CLIENT_SECRET } from '$env/static/private';
 import { PUBLIC_DISCORD_CALLBACK_URL } from '$env/static/public';
 import { redirect } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
@@ -9,7 +10,7 @@ import { BotResult } from '$lib/BotResult';
 async function getOAuthTokens(code: string) {
     const url = 'https://discord.com/api/v10/oauth2/token';
     const body = new URLSearchParams({
-        client_id: `${DISCORD_CLIENT_ID}`,
+        client_id: `${PUBLIC_DISCORD_CLIENT_ID}`,
         client_secret: `${DISCORD_CLIENT_SECRET}`,
         grant_type: 'authorization_code',
         code,
