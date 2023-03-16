@@ -9,8 +9,8 @@ export const config: ITournamentConfig = {
         "ownerId": "188597497294225408",
         "roles": [
             {
-                "id": "TODO",
-                "name": "2023 - Verified"
+                "id": "1086007415507525764",
+                "name": "Verified"
             }
         ]
     }
