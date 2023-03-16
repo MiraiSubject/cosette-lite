@@ -26,6 +26,10 @@ interface SessionData {
 		username?: string;
 		joinDate: luxon.DateTime
 	}
+	reddit?: {
+		state?: string;
+		username?: string;
+	}
 	discord?: {
 		id?: string;
 		state?: string;
