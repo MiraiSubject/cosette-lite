@@ -155,10 +155,10 @@ export const GET = (async ({ url, locals }) => {
     
     if (result === BotResult.Full) {
         locals.session.data.error = "You have joined the maxmium amount of servers. Please leave a server before trying to rejoin this one."
-        return Response.redirect('/');
+        throw redirect(302, '/');
     } else if (result === BotResult.Error) {
         locals.session.data.error = "An unknown error occured while trying to join the server."
-        return Response.redirect('/');
+        throw redirect(302, '/');
     }
 
     console.log(`Discord User joined: ${meData.user.id} - ${meData.user.username}`);
