@@ -9,7 +9,7 @@
 <div class="start">
 	<div class="user-info">
 		<p class="right-align">
-			Currently verifying {data.username || ''} ({data.osuId || ''}). <a href="/logout"><strong>Log out?</strong></a>
+			Currently verifying {data.osuUsername || ''} ({data.osuId || ''}) who has reddit account: {data.redditUsername || ''}. <a href="/logout"><strong>Log out?</strong></a>
 		</p>
 	</div>
 	<div>
