@@ -92,6 +92,11 @@ a {
     color: #ffffff;
 }
 
+.reddit {
+    background-color: #FF4500;
+    color: #ffffff;
+  }
+
 .row {
     width: auto;
 }
