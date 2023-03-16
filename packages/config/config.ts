@@ -1,16 +1,16 @@
 import type { ITournamentConfig } from "./config.interface";
 
 export const config: ITournamentConfig = {
-    "host": "Example Host",
-    "name": "Example tournament name",
+    "host": "/r/osuplace",
+    "name": "/r/osuplace",
     "discord": {
-        "guildId": "insert discord guild id here",
-        "welcomeChannelId": "insert channel id for welcome messages",
-        "ownerId": "id of guild owner",
+        "guildId": "297657542572507137",
+        "welcomeChannelId": "1086005953469620345",
+        "ownerId": "188597497294225408",
         "roles": [
             {
-                "id": "roleId",
-                "name": "Verified"
+                "id": "TODO",
+                "name": "2023 - Verified"
             }
         ]
     }
