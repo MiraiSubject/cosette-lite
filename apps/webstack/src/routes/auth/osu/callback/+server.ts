@@ -72,7 +72,7 @@ export const GET = (async ({ url, locals }) => {
             return new Response(null, {
                 status: 302,
                 headers: {
-                    location: "/checks/discord"
+                    location: "/checks/reddit"
                 }
             });
         }
