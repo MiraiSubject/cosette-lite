@@ -3,37 +3,38 @@
 // and what to do when importing types
 
 declare namespace App {
-	// interface Error {}
-	// interface Locals {}
-	interface Locals {
-		session: import('svelte-kit-cookie-session').Session<SessionData>;
-	}
+    // interface Error {}
+    // interface Locals {}
+    interface Locals {
+        session: import("svelte-kit-cookie-session").Session<SessionData>;
+    }
 
-	type Session = SessionData
+    type Session = SessionData;
 
-	interface PageData {
-		session: SessionData;
-	}
-	// interface PageData {}
-	// interface Platform {}
+    interface PageData {
+        session: SessionData;
+    }
+    // interface PageData {}
+    // interface Platform {}
 }
 
 /// <reference types="@sveltejs/kit" />
 
 interface SessionData {
-	osu?: {
-		id?: string;
-		username?: string;
-		joinDate: luxon.DateTime
-	}
-	reddit?: {
-		state?: string;
-		username?: string;
-	}
-	discord?: {
-		id?: string;
-		state?: string;
-	}
-	error?: string;
+    osu?: {
+        id: string;
+        username: string;
+        joinDate: luxon.DateTime;
+        playCount: number;
+    };
+    reddit?: {
+        username: string;
+        joinDate: luxon.DateTime;
+    };
+    discord?: {
+        id: string;
+        state: string;
+    };
+    reason?: string;
+    error?: string;
 }
-

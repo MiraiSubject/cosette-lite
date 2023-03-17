@@ -56,43 +56,27 @@ export const GET = (async ({ url, locals }) => {
         const tokens = await getOAuthTokens(code);
         const meData = await getUserData(tokens);
 
-        console.log(meData);
-
         const joinDate = DateTime.fromSeconds(meData.created);
 
         await locals.session.update((data) => {
             data.reddit = {
                 username: meData.name,
+                joinDate,
             }
             return data;
         });
 
-        const threshold = DateTime.fromISO("2023-03-13T00:00:00.000Z")
-
-        if (threshold > joinDate) {
             return new Response(null, {
                 status: 302,
                 headers: {
                     location: "/checks/discord"
                 }
             });
-        }
 
-        await locals.session.update((data) => {
-            data.error = `Reddit is created after the threshold (account age is ${joinDate.toISODate()})`
-            return data;
-        });
-
-        return new Response(null, {
-            status: 302,
-            headers: {
-                location: "/checks/manual"
-            }
-        })
     } catch (e) {
         console.error('Error parsing JSON', e);
         locals.session.set({
-            error: "Error reading osu! profile data"
+            error: "Error reading Reddit profile data"
         });
 
         throw redirect(302, '/');
