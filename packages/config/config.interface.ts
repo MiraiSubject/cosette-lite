@@ -11,5 +11,6 @@ export interface ITournamentConfig {
         welcomeChannelId: string;
         ownerId: string;
         roles: ITournamentRole[];
+        preVerifiedRoles: string[];
     }
 }

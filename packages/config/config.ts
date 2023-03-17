@@ -12,6 +12,10 @@ export const config: ITournamentConfig = {
                 "id": "1086007415507525764",
                 "name": "Verified"
             }
+        ],
+        "preVerifiedRoles": [
+            "297658078395105280",
+            "958292223642988575",
         ]
     }
 }
