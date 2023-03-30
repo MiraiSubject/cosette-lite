@@ -119,15 +119,6 @@ async function joinDiscordServer(user: User, token: string, nickname: string): P
                 }
             }
         }
-
-        await got.post("unix:/tmp/gg.mirai.oth.discordbot-api.sock:/api/setupuser", {
-            enableUnixSockets: true,
-            json: {
-                userId: user.id,
-                nickname
-            }
-        });
-
         return BotResult.Success;
     } catch (e) {
         console.log(e);
@@ -231,30 +222,50 @@ export const GET = (async ({ url, locals }) => {
             }
         });
     }
+    const nickname = `/u/${locals.session.data.reddit!.username}`;
+    const result: BotResult = await joinDiscordServer(
+        meData.user,
+        tokens.access_token,
+        nickname
+    );
+
+    console.log(result);
+
+    if (result === BotResult.Full) {
+        locals.session.data.error =
+            "You have joined the maxmium amount of servers. Please leave a server before trying to join this one.";
+        throw redirect(302, "/");
+    } else if (result === BotResult.Error) {
+        locals.session.data.error = "An unknown error occured while trying to join the server.";
+        throw redirect(302, "/");
+    }
+    console.log(`Discord User joined: ${meData.user.id} - ${meData.user.username}`);
 
     if (verified) {
-        const result: BotResult = await joinDiscordServer(
-            meData.user,
-            tokens.access_token,
-            locals.session.data.osu?.username || ""
-        );
-
-        console.log(result);
-
-        if (result === BotResult.Full) {
-            locals.session.data.error =
-                "You have joined the maxmium amount of servers. Please leave a server before trying to join this one.";
-            throw redirect(302, "/");
-        } else if (result === BotResult.Error) {
-            locals.session.data.error = "An unknown error occured while trying to join the server.";
-            throw redirect(302, "/");
-        }
-
-        console.log(`Discord User joined: ${meData.user.id} - ${meData.user.username}`);
+        await got.post("unix:/tmp/gg.mirai.oth.discordbot-api.sock:/api/setupverifieduser", {
+            enableUnixSockets: true,
+            json: {
+                userId: meData.user.id,
+                osu_url: `https://osu.ppy.sh/users/${locals.session.data.osu?.id}`,
+                reddit_url: `https://reddit.com/u/${locals.session.data.reddit?.username}`,
+                nickname,
+                
+            }
+        });
 
         throw redirect(302, "/done");
     } else {
         await locals.session.update((data) => ({ ...data, reason: errReason }));
+
+        await got.post("unix:/tmp/gg.mirai.oth.discordbot-api.sock:/api/setupmanualuser", {
+            enableUnixSockets: true,
+            json: {
+                userId: meData.user.id,
+                osu_url: `https://osu.ppy.sh/users/${locals.session.data.osu?.id}`,
+                reddit_url: `https://reddit.com/u/${locals.session.data.reddit?.username}`,
+                      }
+        });
+
 
         return new Response(null, {
             status: 302,

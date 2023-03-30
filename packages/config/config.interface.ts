@@ -8,9 +8,10 @@ export interface ITournamentConfig {
     host: string;
     discord: {
         guildId: string;
-        welcomeChannelId: string;
+        auditChannelId: string;
         ownerId: string;
-        roles: ITournamentRole[];
+        verifiedRoles: ITournamentRole[];
+        manualRoles: ITournamentRole[];
         preVerifiedRoles: string[];
     }
 }

@@ -18,8 +18,7 @@ type MemberExistsRequest = FastifyRequest<{
   };
 }>;
 
-fastify.get(
-  "/api/guildmemberexists",
+fastify.get("/api/guildmemberexists",
   async (request: MemberExistsRequest, reply: FastifyReply) => {
     const { guildId, userId } = request.query;
     const exists = await bot.guildMemberExists(guildId, userId);
@@ -28,8 +27,7 @@ fastify.get(
   }
 );
 
-fastify.get(
-  "/api/preverified",
+fastify.get("/api/preverified",
   async (request: MemberExistsRequest, reply: FastifyReply) => {
     const { guildId, userId } = request.query;
     const preverified = await bot.preVerified(guildId, userId);
@@ -38,26 +36,55 @@ fastify.get(
   }
 );
 
-const schema = {
-  body: {
-    type: "object",
-    required: ["userId", "nickname"],
-    properties: {
-      userId: { type: "string" },
-      nickname: { type: "string" },
+
+fastify.post("/api/setupverifieduser",
+  {
+    schema: {
+      body: {
+        type: "object",
+        required: ["userId", "nickname", "osu_url", "reddit_url"],
+        properties: {
+          userId: { type: "string" },
+          osu_url: { type: "string" },
+          reddit_url: { type: "string" },
+        },
+      },
     },
   },
-};
-
-fastify.post(
-  "/api/setupuser",
-  { schema },
   async (request: FastifyRequest, reply: FastifyReply) => {
-    const { userId, nickname } = request.body as {
+    const { userId, nickname, osu_url, reddit_url } = request.body as {
       userId: string;
       nickname: string;
+      osu_url: string;
+      reddit_url: string;
     };
-    await bot.setUpUser(userId, nickname);
+    await bot.setupVerified(userId, nickname, {osu_url, reddit_url});
+
+    return reply.send(true);
+  }
+);
+
+fastify.post("/api/setupmanualuser",
+  {
+    schema: {
+      body: {
+        type: "object",
+        required: ["userId", "osu_url", "reddit_url"],
+        properties: {
+          userId: { type: "string" },
+          osu_url: { type: "string" },
+          reddit_url: { type: "string" },
+        },
+      },
+    },
+  },
+  async (request: FastifyRequest, reply: FastifyReply) => {
+    const { userId, osu_url, reddit_url } = request.body as {
+      userId: string;
+      osu_url: string;
+      reddit_url: string;
+    };
+    await bot.setupManual(userId, {osu_url, reddit_url});
 
     return reply.send(true);
   }
