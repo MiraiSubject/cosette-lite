@@ -20,7 +20,7 @@
 		<p>This information will be used to:</p>
 		<ul>
 			<li>Join your account to the server, if you haven't yet.</li>
-			<li>Change the nickname on the discord server to your osu! username.</li>
+			<li>Change the nickname on the discord server to your Reddit username.</li>
 			<li>Add roles to your account on the server.</li>
 		</ul>
 		<p>
