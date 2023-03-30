@@ -141,7 +141,7 @@ async function verify(dcUser: User, data: SessionData): Promise<Allowed> {
                 `osu! account is not older than 6 months (account made at ${data.osu.joinDate.toISODate()})`
             ];
 
-        if (data.osu.playCount < 400000)
+        if (data.osu.playCount < 10)
             return [
                 false,
                 `osu! account has too few plays (account has ${data.osu.playCount} on main gamemode)`
