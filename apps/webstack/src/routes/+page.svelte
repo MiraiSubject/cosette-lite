@@ -18,7 +18,7 @@
 	<div>
 		<p>First we need to verify your account!</p>
 		<p>
-			You will be asked to login with your osu! account first, and then with your Discord account.
+			You will be asked to login with your osu! account first, Reddit account second, and then with your Discord account.
 		</p>
 		<p>Your osu! account information will be used to:</p>
 		<ul>
