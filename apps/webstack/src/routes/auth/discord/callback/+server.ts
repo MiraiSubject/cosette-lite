@@ -87,8 +87,6 @@ async function joinDiscordServer(user: User, token: string, nickname: string): P
             }
         );
 
-        console.log(response);
-
         switch (response.status) {
             case 201:
                 console.log(`Joined ${user.id} to server!`);
@@ -228,8 +226,6 @@ export const GET = (async ({ url, locals }) => {
         tokens.access_token,
         nickname
     );
-
-    console.log(result);
 
     if (result === BotResult.Full) {
         locals.session.data.error =
