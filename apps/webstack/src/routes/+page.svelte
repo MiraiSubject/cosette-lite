@@ -39,7 +39,7 @@
 	<div>
 		<p>
 			This web site is not endorsed by, directly affiliated with, maintained, authorized, or
-			sponsored by osu!, ppy, or Discord. All product and company names are the registered
+			sponsored by osu!, ppy, Reddit, or Discord. All product and company names are the registered
 			trademarks of their original owners.
 		</p>
 		<p>This is an <strong>unofficial</strong> server.</p>
