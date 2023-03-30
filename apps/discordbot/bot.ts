@@ -112,7 +112,7 @@ export default class DiscordBot extends Client {
 
       const channelId = this.tourneyConfig.discord.auditChannelId;
       const auditChannel = guildMember.guild.channels.cache.get(channelId) as TextChannel;
-      auditChannel.send(`<@${userId}> verified as ${osu_url} ${reddit_url}`)
+      auditChannel.send(`<@${userId}> verified as <${osu_url}> <${reddit_url}>`)
 
     } catch (e) {
       console.error(e);
