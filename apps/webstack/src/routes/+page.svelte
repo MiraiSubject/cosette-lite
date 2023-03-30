@@ -23,7 +23,12 @@
 		<p>Your osu! account information will be used to:</p>
 		<ul>
 			<li>Verify that you own this account, to prevent impersonation of others</li>
-			<li>Attach your osu! username as a nickname in the discord server</li>
+			<li>Read public profile information</li>
+		</ul>
+		<p>Your Reddit account information will be used to:</p>
+		<ul>
+			<li>Verify that you own this account, to prevent impersonation of others</li>
+			<li>Change the nickname on the Discord server to your Reddit username</li>
 		</ul>
 		<p>Your Discord account information will be used to:</p>
 		<ul>
