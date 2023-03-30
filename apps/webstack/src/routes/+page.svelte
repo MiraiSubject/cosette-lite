@@ -33,7 +33,6 @@
 		<p>Your Discord account information will be used to:</p>
 		<ul>
 			<li>Join your account to the server, if you haven't yet</li>
-			<li>Change the nickname on the discord server to your osu! username</li>
 			<li>Add role(s) to your user on the server on behalf of the host.</li>
 		</ul>
 	</div>
