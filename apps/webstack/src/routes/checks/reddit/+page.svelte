@@ -18,8 +18,8 @@
 		<p>In this step, we will need some information about your Reddit account.</p>
 		<p>This information will be used to:</p>
 		<ul>
-			<li>Make sure your Reddit account was made before this years event began.</li>
-			<li>Change the nickname on the discord server to your Reddit username.</li>
+			<li>Make sure your Reddit account was made before this year's event began.</li>
+			<li>Change the nickname on the Discord server to your Reddit username.</li>
 		</ul>
 		<p>
 			<strong

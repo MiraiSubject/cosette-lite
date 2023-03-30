@@ -16,11 +16,11 @@
 		<h1>Connect your Discord account</h1>
 	</div>
 	<div>
-		<p>In this last step, we will need some information about your discord account.</p>
+		<p>In this last step, we will need some information about your Discord account.</p>
 		<p>This information will be used to:</p>
 		<ul>
 			<li>Join your account to the server, if you haven't yet.</li>
-			<li>Change the nickname on the discord server to your Reddit username.</li>
+			<li>Change your nickname on the Discord server to your Reddit username.</li>
 			<li>Add roles to your account on the server.</li>
 		</ul>
 		<p>
