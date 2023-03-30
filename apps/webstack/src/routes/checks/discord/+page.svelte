@@ -21,12 +21,7 @@
 		<ul>
 			<li>Join your account to the server, if you haven't yet.</li>
 			<li>Change the nickname on the discord server to your osu! username.</li>
-			<li>Add the following roles to your account on the server:</li>
-		</ul>
-		<ul>
-			{#each config.discord.roles as role}
-				<li>{role.name}</li>
-			{/each}
+			<li>Add roles to your account on the server.</li>
 		</ul>
 		<p>
 			<strong
