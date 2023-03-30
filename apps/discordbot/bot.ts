@@ -87,7 +87,7 @@ export default class DiscordBot extends Client {
           guildMember.nickname
         }...`
       );
-      guildMember.roles.add(roles.map((info) => info.id));
+      await guildMember.roles.add(roles.map((info) => info.id));
     } catch (e) {
       console.error(
         `Failed to add some roles to ${guildMember.nickname}.\nReason: ${e}`
@@ -108,7 +108,8 @@ export default class DiscordBot extends Client {
       );
       console.log(`Added ${nickname} nickname to ${userId}.`);
 
-      this.giveRoles(config.discord.verifiedRoles, guildMember);
+      await this.giveRoles(config.discord.verifiedRoles, guildMember);
+      await guildMember.roles.remove(config.discord.manualRoles.map(({id}) => id));
 
       const channelId = this.tourneyConfig.discord.auditChannelId;
       const auditChannel = guildMember.guild.channels.cache.get(channelId) as TextChannel;
@@ -127,7 +128,7 @@ export default class DiscordBot extends Client {
       );
 
       
-      this.giveRoles(config.discord.manualRoles, guildMember);
+      await this.giveRoles(config.discord.manualRoles, guildMember);
       console.log(`Added manual verification role to ${userId}.`);
 
       // maybe send a message in manual verification chat???
