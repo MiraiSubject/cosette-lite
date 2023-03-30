@@ -108,7 +108,7 @@ export default class DiscordBot extends Client {
       );
       console.log(`Added ${nickname} nickname to ${userId}.`);
 
-      this.giveRoles(config.discord.manualRoles, guildMember);
+      this.giveRoles(config.discord.verifiedRoles, guildMember);
 
       const channelId = this.tourneyConfig.discord.auditChannelId;
       const auditChannel = guildMember.guild.channels.cache.get(channelId) as TextChannel;
