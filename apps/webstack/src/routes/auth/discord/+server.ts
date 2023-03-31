@@ -11,7 +11,7 @@ function getOAuthUrl() {
 
     const url = new URL('https://discord.com/api/oauth2/authorize');
     url.searchParams.set('client_id', `${pubEnv.PUBLIC_DISCORD_CLIENT_ID}`);
-    url.searchParams.set('redirect_uri', `${pubEnv.PUBLIC_DISCORD_CALLBACK_URL}`);
+    url.searchParams.set('redirect_uri', `${pubEnv.PUBLIC_BASE_URL}/auth/discord/callback`);
     url.searchParams.set('response_type', 'code');
     url.searchParams.set('state', state);
     url.searchParams.set('scope', 'role_connections.write identify');
