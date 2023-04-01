@@ -1,9 +1,6 @@
 import Fastify, { FastifyReply, FastifyRequest } from 'fastify';
-import dotenv from 'dotenv';
 import DiscordBot from './bot';
 import fs from 'fs'
-
-dotenv.config();
 
 const bot = new DiscordBot();
 
