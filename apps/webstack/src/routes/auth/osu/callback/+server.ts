@@ -3,6 +3,7 @@ import { env as pubEnv } from '$env/dynamic/public';
 import { redirect } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { DateTime } from "luxon";
+import type { OsuUser } from '$lib/OsuUser';
 
 async function getOAuthTokens(code: string) {
     const url = 'https://osu.ppy.sh/oauth/token';
@@ -47,6 +48,12 @@ async function getUserData(tokens: {
     }
 }
 
+function isUserEligible(meData: OsuUser): boolean {
+    const joinDate = DateTime.fromISO(meData.join_date);
+    const nowMinus6Months = DateTime.now().minus({ months: 6 });
+
+    return nowMinus6Months > joinDate;
+}
 
 // Write cookie for the state which will be used to compare later for the linked role stuff.
 export const GET = (async ({ url, locals }) => {
@@ -56,19 +63,15 @@ export const GET = (async ({ url, locals }) => {
         const tokens = await getOAuthTokens(code);
         const meData = await getUserData(tokens);
 
-        const joinDate = DateTime.fromISO(meData.join_date)
-
         await locals.session.set({
             osu: {
                 id: meData.id,
                 username: meData.username,
-                joinDate
+                joinDate: DateTime.fromISO(meData.join_date)
             }
         });
 
-        const nowMinus6Months = DateTime.now().minus({ months: 6 });
-
-        if (nowMinus6Months > joinDate) {
+        if (isUserEligible(meData)) {
             return new Response(null, {
                 status: 302,
                 headers: {
@@ -78,7 +81,7 @@ export const GET = (async ({ url, locals }) => {
         }
 
         await locals.session.update((data) => {
-            data.error = `osu! account is not older than 6 months yet (account age is ${joinDate.toISODate()})`
+            data.error = `osu! account is not older than 6 months yet (account age is ${DateTime.fromISO(meData.join_date).toISODate()})`
             return data;
         });
 
