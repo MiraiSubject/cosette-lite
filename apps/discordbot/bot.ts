@@ -11,16 +11,13 @@ export default class DiscordBot extends Client {
 
         this.on('userVerified', async (guild: Guild, member: GuildMember) => {
             try {
-
-                const channelId = this.tourneyConfig.discord.welcomeChannelId;
-                const channel = guild.channels.cache.get(channelId) as TextChannel;
+                const channel = guild.channels.cache.get(this.tourneyConfig.discord.welcomeChannelId) as TextChannel;
 
                 channel.send(`Welcome ${member} you are now verified!`)
             } catch (e) {
                 console.error(e);
             }
         });
-
     }
 
     private async findGuildMember(guildId: string, userId: string) {
@@ -37,8 +34,7 @@ export default class DiscordBot extends Client {
         }
 
         if (guildMember === undefined) {
-            console.log(`Guild member ${userId} not found, moving on...`);
-            throw new Error("Member not found!");
+            throw new Error(`Guild member ${userId} not found, moving on...`);
         }
 
         return guildMember;
@@ -57,20 +53,11 @@ export default class DiscordBot extends Client {
         }
     }
 
-    private async changeNickName(nickname: string, member: GuildMember) {
-        try {
-            await member.setNickname(nickname, "Changed nickname to osu! username");
-        } catch (e) {
-            // We will silence this error to the parent function running this so it can continue.
-            console.error(e);
-        }
-    }
-
     public async setUpUser(userId: string, nickname: string): Promise<void> {
         try {
             const guildMember = await this.findGuildMember(this.tourneyConfig.discord.guildId, userId);
 
-            await this.changeNickName(nickname, guildMember);
+            await guildMember.setNickname(nickname, "Changed nickname to osu! username");
             console.log(`Added ${nickname} nickname to ${userId}.`)
 
             const roles = this.tourneyConfig.discord.roles;
