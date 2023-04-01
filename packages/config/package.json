@@ -1,5 +1,9 @@
 {
     "name": "config",
     "version": "0.0.0",
-    "main": "index.ts"
+    "main": "index.ts",
+    "dependencies": {
+        "@types/luxon": "^3.2.0",
+        "luxon": "^3.3.0"
+    }
 }
