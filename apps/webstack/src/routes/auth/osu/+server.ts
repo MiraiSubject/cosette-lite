@@ -8,7 +8,7 @@ import type { RequestHandler } from './$types';
 function getOAuthUrl() {
     const url = new URL('https://osu.ppy.sh/oauth/authorize');
     url.searchParams.set('client_id', `${pubEnv.PUBLIC_OSU2_CLIENT_ID}`);
-    url.searchParams.set('redirect_uri', `${pubEnv.PUBLIC_OSU2_CALLBACK_URL}`);
+    url.searchParams.set('redirect_uri', `${pubEnv.PUBLIC_BASE_URL}/auth/osu/callback`);
     url.searchParams.set('response_type', 'code');
     url.searchParams.set('scope', 'identify');
     return url.toString();

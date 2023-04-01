@@ -13,7 +13,7 @@ async function getOAuthTokens(code: string) {
         client_secret: `${env.DISCORD_CLIENT_SECRET}`,
         grant_type: 'authorization_code',
         code,
-        redirect_uri: `${pubEnv.PUBLIC_DISCORD_CALLBACK_URL}`,
+        redirect_uri: `${pubEnv.PUBLIC_BASE_URL}/auth/discord/callback`,
     });
 
     const response = await fetch(url, {

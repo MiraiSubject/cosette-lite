@@ -11,7 +11,7 @@ async function getOAuthTokens(code: string) {
         client_secret: `${env.OSU2_CLIENT_SECRET}`,
         grant_type: 'authorization_code',
         code,
-        redirect_uri: `${pubEnv.PUBLIC_OSU2_CALLBACK_URL}`,
+        redirect_uri: `${pubEnv.PUBLIC_BASE_URL}/auth/osu/callback`,
     });
 
     const response = await fetch(url, {
