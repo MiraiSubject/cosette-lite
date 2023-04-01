@@ -19,6 +19,6 @@ jobs:
           node-version: ${{ matrix.node-version }}
           cache: 'pnpm'
       - name: Install dependencies
-        run: pnpm install
+        run: pnpm add --global turbo && pnpm install
       - name: Typecheck the webservice
         run: pnpm check
