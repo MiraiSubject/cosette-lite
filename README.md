@@ -37,12 +37,13 @@ Rename `.env.example` to `.env` and fill in the following information:
         - Client Secret (`OSU2_CLIENT_SECRET`)
 
 Both these OAuth2 providers will request a callback URL in their forms. When developing locally you will need to add the following callback URLs for Discord and osu! respectively:
-- http://localhost:8000/auth/discord/callback (`PUBLIC_DISCORD_CALLBACK_URL`)
-- http://localhost:8000/auth/osu/callback (`PUBLIC_OSU2_CALLBACK_URL`)
+- http://localhost:8000/auth/discord/callback
+- http://localhost:8000/auth/osu/callback
 
-If you intend to deploy for usage on a domain then you will need to use:
-- https://example.com/auth/discord/callback (`PUBLIC_DISCORD_CALLBACK_URL`)
-- https://example.com/auth/osu/callback (`PUBLIC_OSU2_CALLBACK_URL`)
+If you intend to deploy for usage on a domain (whether it's for development or locally) then you will need to use:
+- https://example.com/auth/discord/callback
+- https://example.com/auth/osu/callback
+where example.com is your `PUBLIC_BASE_URL`
 
 In a production environment it's highly recommended to put this behind a reverse proxy like [nginx](https://nginx.org/en/), [caddy](https://caddyserver.com/), or [traefik](https://traefik.io/). Using these proxies you can easily configure secure connections.
 
