@@ -4,7 +4,7 @@
 	"private": true,
 	"scripts": {
 		"dev": "vite dev",
-		"build": "vite build",
+		"build": "pnpm check && vite build",
 		"preview": "vite preview",
 		"test": "playwright test",
 		"start": "node -r dotenv/config build/index.js",
