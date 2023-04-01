@@ -3,6 +3,7 @@ import { env as pubEnv } from '$env/dynamic/public';
 import { redirect } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { DateTime } from "luxon";
+import { isUserEligible } from 'config';
 import type { OsuUser } from '$lib/OsuUser';
 
 async function getOAuthTokens(code: string) {
@@ -48,32 +49,17 @@ async function getUserData(tokens: {
     }
 }
 
-/**
-    * @description This function is used to check if the user is eligible for the verified role(s) specfied in your config.
-    * The default is to check if the user is older than 6 months.
-    * You can modify the function to check for other things, such as if the user has a certain amount of playtime, rank or pp.
-    * @param userData The osu! profile of the user.
-    * @returns A boolean indicating if the user is eligible for the linked role.
-    * 
-*/
-function isUserEligible(userData: OsuUser): boolean {
-    const joinDate = DateTime.fromISO(userData.join_date);
-    const nowMinus6Months = DateTime.now().minus({ months: 6 });
-
-    return nowMinus6Months > joinDate;
-}
-
 // Write cookie for the state which will be used to compare later for the linked role stuff.
 export const GET = (async ({ url, locals }) => {
     try {
         const code = url.searchParams.get('code');
         if (!code) throw new Error('No code provided');
         const tokens = await getOAuthTokens(code);
-        const meData = await getUserData(tokens);
+        const meData = await getUserData(tokens) as OsuUser;
 
         await locals.session.set({
             osu: {
-                id: meData.id,
+                id: meData.id.toString(),
                 username: meData.username,
                 joinDate: DateTime.fromISO(meData.join_date)
             }

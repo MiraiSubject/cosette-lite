@@ -80,7 +80,12 @@ importers:
       vitest: 0.25.8
 
   packages/config:
-    specifiers: {}
+    specifiers:
+      '@types/luxon': ^3.2.0
+      luxon: ^3.3.0
+    dependencies:
+      '@types/luxon': 3.2.0
+      luxon: 3.3.0
 
 packages:
 
