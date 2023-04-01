@@ -1,7 +1,7 @@
 {
     "private": true,
     "scripts": {
-        "dev": "dotenv -- turbo run dev",
+        "dev": "dotenv -- turbo dev",
         "lint": "turbo run lint",
         "build": "turbo run build",
         "format": "prettier --write \"**/*.{ts,tsx,md}\""
