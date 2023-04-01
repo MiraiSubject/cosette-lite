@@ -4,6 +4,7 @@
         "dev": "dotenv -- turbo dev",
         "lint": "turbo run lint",
         "build": "turbo run build",
+        "check": "turbo run check",
         "format": "prettier --write \"**/*.{ts,tsx,md}\""
     },
     "packageManager": "pnpm@7.29.0",
