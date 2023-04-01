@@ -1,4 +1,4 @@
-import type { OsuUser } from "$lib/OsuUser";
+import type { OsuUser } from "../../apps/webstack/src/lib/OsuUser";
 import type { ITournamentConfig } from "./config.interface";
 import { DateTime } from "luxon";
 
