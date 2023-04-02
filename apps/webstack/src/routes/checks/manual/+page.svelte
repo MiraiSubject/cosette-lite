@@ -7,7 +7,7 @@
 <div id="start">
     <div>
       <h1>Manual verification required</h1>
-      <p>Please ping the @Moderators role in the verification channel with a screenshot of this page.</p>
+      <p>Please post a message with a screenshot of this page in #verification-requests.</p>
       <p>Reason: { data.reason }</p>
     </div>
   </div>
