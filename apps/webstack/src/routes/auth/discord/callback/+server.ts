@@ -72,19 +72,64 @@ interface User {
     public_flags: number;
 }
 
+async function setupUser(user: User, token: string, nickname: string): Promise<BotResult> {
+    try {
+        const existsResponse = await userExistsInGuild(user.id)
+        switch (existsResponse) {
+            case MemberResult.Found: {
+                const result = await addRoleToUser(user.id, config.discord.roles.map((val) => val.id), token, nickname);
+
+                switch (result) {
+                    case BotResult.Success:
+                        return BotResult.Success
+                    case BotResult.Error:
+                    default:
+                        return BotResult.Error
+                }
+            }
+            default:
+            case MemberResult.NotFound: {
+                const joinResponse = await joinDiscordServer(user, token, nickname);
+                switch (joinResponse) {
+                    case BotResult.Success: {
+                        const result = await addRoleToUser(user.id, config.discord.roles.map((val) => val.id), token, nickname);
+                        switch (result) {
+                            case BotResult.Success:
+                                return BotResult.Success
+                            default:
+                                return BotResult.Error
+                        }
+                    }
+                    case BotResult.Full:
+                        return BotResult.Full
+                    default:
+                        return BotResult.Error
+                }
+            }
+        }
+    } catch (e) {
+        console.log(e);
+        return BotResult.Error
+    }
+}
+
 async function joinDiscordServer(user: User, token: string, nickname: string): Promise<BotResult> {
     try {
-        const response = await fetch(`https://discord.com/api/guilds/${config.discord.guildId}/members/${user.id}`, {
+        // Join user to the discord server.
+        const response = await fetch(`https://discord.com/api/v10/guilds/${config.discord.guildId}/members/${user.id}`, {
             body: JSON.stringify({
-                access_token: token
+                access_token: token,
+                nick: nickname,
+                roles: config.discord.roles.map((val) => val.id)
             }),
-            method: 'POST',
+            method: 'PUT',
             headers: {
                 "Content-Type": "application/json",
                 "Authorization": `Bot ${env.DISCORD_BOT_TOKEN}`
             },
         });
 
+        // Check if user already exists in the server.
         switch (response.status) {
             case 201:
                 console.log(`Joined ${user.id} to server!`);
@@ -93,31 +138,13 @@ async function joinDiscordServer(user: User, token: string, nickname: string): P
                 console.log(`User is already in the guild.`);
                 break;
             case 400: {
-                console.log(`${user.id} - ${user.username} has reached maximum guilds, checking if user is present in guild...`);
-
-                const exists = await got.get("unix:/tmp/gg.mirai.oth.discordbot-api.sock:/api/guildmemberexists", {
-                    enableUnixSockets: true,
-                    searchParams: {
-                        guildId: config.discord.guildId,
-                        userId: user.id
-                    }
-                });
-
-                if (exists) {
-                    break;
-                } else {
-                    return BotResult.Full;
-                }
+                console.log(`${user.id} - ${user.username} has reached maximum guilds.`);
+                return BotResult.Full;
             }
+            case 403:
+            default:
+                return BotResult.Error
         }
-
-        await got.post("unix:/tmp/gg.mirai.oth.discordbot-api.sock:/api/setupuser", {
-            enableUnixSockets: true,
-            json: {
-                userId: user.id,
-                nickname,
-            }
-        });
 
         return BotResult.Success;
     } catch (e) {
@@ -125,6 +152,95 @@ async function joinDiscordServer(user: User, token: string, nickname: string): P
         return BotResult.Error;
     }
 }
+
+enum MemberResult {
+    Found,
+    NotFound,
+    Error
+}
+
+async function userExistsInGuild(id: string): Promise<MemberResult> {
+    try {
+        const response = await fetch(`https://discord.com/api/v10/guilds/${config.discord.guildId}/members/${id}`, {
+            method: 'GET',
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bot ${env.DISCORD_BOT_TOKEN}`
+            },
+        });
+
+        switch (response.status) {
+            case 200:
+                return MemberResult.Found
+            case 404:
+            default:
+                return MemberResult.NotFound
+        }
+    } catch (e) {
+        console.error(e);
+        return MemberResult.Error
+    }
+}
+
+async function addRoleToUser(userId: string, roles: string[], token: string, nick: string): Promise<BotResult> {
+    const response = await fetch(`https://discord.com/api/v10/guilds/${config.discord.guildId}/members/${userId}`, {
+        body: JSON.stringify({
+            access_token: token,
+            nick,
+            roles: config.discord.roles.map((val) => val.id)
+        }),
+        method: 'PATCH',
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bot ${env.DISCORD_BOT_TOKEN}`
+        },
+    });
+
+    console.log(response.status);
+
+    switch (response.status) {
+        case 200:
+        case 204:
+            return BotResult.Success
+        case 400:
+        case 404:
+        default:
+            return BotResult.Error
+    }
+}
+
+async function sendMessageToWelcomeChannel(data: SessionData) {
+    const body = JSON.stringify({
+        embeds: [
+            {
+                "title": `${data.osu?.username} has joined the server!`,
+                "color": 2458853,
+                "timestamp": `${new Date().toISOString()}`,
+                "thumbnail": {
+                    "url": `https://a.ppy.sh/${data.osu?.id}?428927893258930.jpeg`
+                },
+                "author": {
+                    "name": `User joined ${config.name}`,
+                    "url": `${pubEnv.PUBLIC_BASE_URL}`
+                }
+            }
+        ]
+    })
+    try {
+        await fetch(`https://discord.com/api/v10/channels/${config.discord.welcomeChannelId}/messages`, {
+            method: 'POST',
+            body,
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bot ${env.DISCORD_BOT_TOKEN}`
+            },
+        });
+    } catch (e) {
+        console.error("Unable to send join message");
+        console.error(e)
+    }
+}
+
 
 // Write cookie for the state which will be used to compare later for the linked role stuff.
 export const GET = (async ({ url, locals }) => {
@@ -150,8 +266,8 @@ export const GET = (async ({ url, locals }) => {
 
     const meData: DiscordData = await getUserData(tokens);
 
-    const result: BotResult = await joinDiscordServer(meData.user, tokens.access_token, locals.session.data.osu?.username || '');
-    
+    const result: BotResult = await setupUser(meData.user, tokens.access_token, locals.session.data.osu?.username || '');
+
     if (result === BotResult.Full) {
         locals.session.data.error = "You have joined the maxmium amount of servers. Please leave a server before trying to rejoin this one."
         throw redirect(302, '/');
@@ -159,6 +275,8 @@ export const GET = (async ({ url, locals }) => {
         locals.session.data.error = "An unknown error occured while trying to join the server."
         throw redirect(302, '/');
     }
+
+    sendMessageToWelcomeChannel.call(this, locals.session.data);
 
     console.log(`Discord User joined: ${meData.user.id} - ${meData.user.username}`);
 
