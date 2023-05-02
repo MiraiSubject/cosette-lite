@@ -252,13 +252,19 @@ export const GET = (async ({ url, locals }) => {
 
     if (clientState !== state) {
         console.error('State verification failed.');
-        locals.session.data.error = "Backend error occured."
+        locals.session.update((data) => {
+            data.error = "Backend error occured."
+            return data;
+        });
         return Response.redirect('/');
     }
 
     if (!code) {
         console.error('No code provided.');
-        locals.session.data.error = "Backend error occured."
+        locals.session.update((data) => {
+            data.error = "Backend error occured."
+            return data;
+        });
         return Response.redirect('/');
     }
 
@@ -269,10 +275,16 @@ export const GET = (async ({ url, locals }) => {
     const result: BotResult = await setupUser(meData.user, tokens.access_token, locals.session.data.osu?.username || '');
 
     if (result === BotResult.Full) {
-        locals.session.data.error = "You have joined the maxmium amount of servers. Please leave a server before trying to rejoin this one."
+        locals.session.update((data) => {
+            data.error = "You have joined the maxmium amount of servers. Please leave a server before trying to rejoin this one."
+            return data;
+        });
         throw redirect(302, '/');
     } else if (result === BotResult.Error) {
-        locals.session.data.error = "An unknown error occured while trying to join the server."
+        locals.session.update((data) => {
+            data.error = "An unknown error occured while trying to join the server."
+            return data;
+        });
         throw redirect(302, '/');
     }
 
