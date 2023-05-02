@@ -2,8 +2,7 @@ import { env } from '$env/dynamic/private';
 import { env as pubEnv } from '$env/dynamic/public';
 import { redirect } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
-import { config } from '../../../../../../../packages/config/config';
-import got from 'got';
+import { config } from 'config';
 import { BotResult } from '$lib/BotResult';
 
 async function getOAuthTokens(code: string) {
