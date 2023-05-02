@@ -241,7 +241,6 @@ async function sendMessageToWelcomeChannel(data: SessionData) {
     }
 }
 
-
 // Write cookie for the state which will be used to compare later for the linked role stuff.
 export const GET = (async ({ url, locals }) => {
 
