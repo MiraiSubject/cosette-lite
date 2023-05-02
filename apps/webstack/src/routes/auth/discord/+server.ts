@@ -14,7 +14,7 @@ function getOAuthUrl() {
     url.searchParams.set('redirect_uri', `${pubEnv.PUBLIC_BASE_URL}/auth/discord/callback`);
     url.searchParams.set('response_type', 'code');
     url.searchParams.set('state', state);
-    url.searchParams.set('scope', 'role_connections.write identify');
+    url.searchParams.set('scope', 'guilds.join identify');
     url.searchParams.set('prompt', 'consent');
     return { state, url: url.toString() };
 }
