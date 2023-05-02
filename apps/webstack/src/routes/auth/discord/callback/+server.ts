@@ -187,7 +187,7 @@ async function addRoleToUser(userId: string, roles: string[], token: string, nic
         body: JSON.stringify({
             access_token: token,
             nick,
-            roles: config.discord.roles.map((val) => val.id)
+            roles
         }),
         method: 'PATCH',
         headers: {
