@@ -4,7 +4,7 @@
 	"private": true,
 	"scripts": {
 		"dev": "vite dev",
-		"build": "vite build",
+		"build": "pnpm check && vite build",
 		"preview": "vite preview",
 		"test": "playwright test",
 		"start": "node -r dotenv/config build/index.js",
@@ -37,7 +37,6 @@
 		"@types/luxon": "^3.2.0",
 		"@types/node": "^18.11.17",
 		"config": "workspace:*",
-		"dotenv": "^16.0.3",
 		"got": "^12.6.0",
 		"luxon": "^3.3.0",
 		"svelte-kit-cookie-session": "^3.3.2",

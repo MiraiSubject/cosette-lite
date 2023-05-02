@@ -1,9 +1,6 @@
 import Fastify, { FastifyReply, FastifyRequest } from 'fastify';
-import dotenv from 'dotenv';
 import DiscordBot from './bot';
 import fs from 'fs'
-
-dotenv.config();
 
 const bot = new DiscordBot();
 
@@ -45,7 +42,6 @@ fastify.post('/api/setupuser', { schema }, async (request: FastifyRequest, reply
 
 
 const start = async () => {
-
     // Remove socket file if it exists. Could be made cleaner by just cleaning up the file on exit.
     try {
         fs.unlinkSync('/tmp/gg.mirai.oth.discordbot-api.sock');

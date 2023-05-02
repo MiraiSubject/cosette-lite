@@ -37,12 +37,13 @@ Rename `.env.example` to `.env` and fill in the following information:
         - Client Secret (`OSU2_CLIENT_SECRET`)
 
 Both these OAuth2 providers will request a callback URL in their forms. When developing locally you will need to add the following callback URLs for Discord and osu! respectively:
-- http://localhost:8000/auth/discord/callback (`PUBLIC_DISCORD_CALLBACK_URL`)
-- http://localhost:8000/auth/osu/callback (`PUBLIC_OSU2_CALLBACK_URL`)
+- http://localhost:8000/auth/discord/callback
+- http://localhost:8000/auth/osu/callback
 
-If you intend to deploy for usage on a domain then you will need to use:
-- https://example.com/auth/discord/callback (`PUBLIC_DISCORD_CALLBACK_URL`)
-- https://example.com/auth/osu/callback (`PUBLIC_OSU2_CALLBACK_URL`)
+If you intend to deploy for usage on a domain (whether it's for development or locally) then you will need to use:
+- https://example.com/auth/discord/callback
+- https://example.com/auth/osu/callback
+where example.com is your `PUBLIC_BASE_URL`
 
 In a production environment it's highly recommended to put this behind a reverse proxy like [nginx](https://nginx.org/en/), [caddy](https://caddyserver.com/), or [traefik](https://traefik.io/). Using these proxies you can easily configure secure connections.
 
@@ -86,6 +87,33 @@ export const config: ITournamentConfig = {
             }
         ]
     }
+}
+```
+
+You can also modify the `isUserEligible` function to customise it according to your needs. The function just has to return a boolean for the condition where a user is eligible.
+
+The default implementation that we use for verification on the osu! Tournament Hub: 
+https://github.com/MiraiSubject/cosette-lite/blob/9ee4cb86f20debf4e2e7f86e9d52f5610408fe5e/packages/config/config.ts#L21-L34
+
+**Note: By default the `OsuUser` in the parameter uses their favourite game mode.**
+
+To modify it to use your desired game mode `./apps/webstack/src/routes/auth/osu/callback/+server.ts` [this file](https://github.com/MiraiSubject/cosette-lite/blob/master/apps/webstack/src/routes/auth/osu/callback/%2Bserver.ts) to match the game mode. 
+
+Currently the valid modes according to the current osu! [API documentation](https://osu.ppy.sh/docs/index.html#gamemode) are:
+- `fruits` for osu!catch
+- `mania` for osu!mania
+- `osu` for	osu!standard
+- `taiko` for osu!taiko
+
+Here is how you would modify the function to get the user's data for the appropriate game mode: 
+```diff
+async function getUserData(tokens: {
+    access_token: string;
+    token_type: string;
+}) {
+-   const url = 'https://osu.ppy.sh/api/v2/me';
++   const url = 'https://osu.ppy.sh/api/v2/me/osu';
+// ...
 }
 ```
 
