@@ -210,22 +210,25 @@ async function addRoleToUser(userId: string, roles: string[], token: string, nic
 }
 
 async function sendMessageToWelcomeChannel(data: SessionData) {
+
     const body = JSON.stringify({
-        embeds: [
-            {
-                "title": `${data.osu?.username} has joined the server!`,
-                "color": 2458853,
-                "timestamp": `${new Date().toISOString()}`,
-                "thumbnail": {
-                    "url": `https://a.ppy.sh/${data.osu?.id}?428927893258930.jpeg`
-                },
-                "author": {
-                    "name": `User joined ${config.name}`,
-                    "url": `${pubEnv.PUBLIC_BASE_URL}`
-                }
-            }
-        ]
-    })
+        content: `Welcome <@${data.discord?.id}> you are now verified!`
+        // embeds: [
+        //     {
+        //         "title": `${data.osu?.username} has joined the server!`,
+        //         "color": 2458853,
+        //         "timestamp": `${new Date().toISOString()}`,
+        //         "thumbnail": {
+        //             "url": `https://a.ppy.sh/${data.osu?.id}?428927893258930.jpeg`
+        //         },
+        //         "author": {
+        //             "name": `User sucessfully joined ${config.name}`,
+        //             "url": `${pubEnv.PUBLIC_BASE_URL}`
+        //         }
+        //     }
+        // ]
+    });
+
     try {
         await fetch(`https://discord.com/api/v10/channels/${config.discord.welcomeChannelId}/messages`, {
             method: 'POST',
