@@ -18,16 +18,4 @@ services:
       OSU2_CLIENT_SECRET:
       PUBLIC_OSU2_CALLBACK_URL:
       PRIVATE_COOKIE_SECRET:
-    volumes:
-      - bot-socket:/tmp
-  cosette-bot:
-    restart: always
-    build:
-      context: .
-      dockerfile: ./apps/discordbot/Dockerfile
-    environment:
-      DISCORD_BOT_TOKEN:
-    volumes:
-      - bot-socket:/tmp
-volumes:
-  bot-socket:
+
