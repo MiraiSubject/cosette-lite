@@ -3,7 +3,15 @@ import { env as pubEnv } from '$env/dynamic/public';
 import { redirect } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { config } from 'config';
-import { BotResult } from '$lib/BotResult';
+import { BotResult } from '$lib/DiscordTypes';
+import type { DiscordOAuth2User, DiscordData, DiscordErrorResponse } from '$lib/DiscordTypes';
+import type { RESTGetAPIGuildMemberResult } from 'discord-api-types/rest'
+
+enum MemberResult {
+    Found,
+    NotFound,
+    Error
+}
 
 async function getOAuthTokens(code: string) {
     const url = 'https://discord.com/api/v10/oauth2/token';
@@ -48,79 +56,60 @@ async function getUserData(tokens: {
     }
 }
 
-interface DiscordData {
-    application: Application;
-    scopes: string[];
-    expires: string;
-    user: User;
-}
-interface Application {
-    id: string;
-    name: string;
-    icon: string;
-    description: string;
-    hook: boolean;
-    bot_public: boolean;
-    bot_require_code_grant: boolean;
-    verify_key: string;
-}
-interface User {
-    id: string;
-    username: string;
-    avatar: string;
-    discriminator: string;
-    public_flags: number;
-}
-
-interface DiscordErrorResponse {
-    code: number;
-    message: string;
-}
-
-async function setupUser(user: User, token: string, nickname: string): Promise<BotResult> {
-    try {        
-        const existsResponse = await userExistsInGuild(user.id);
-        switch (existsResponse) {
+async function setupUser(user: DiscordOAuth2User, token: string, nickname: string): Promise<{
+    result: BotResult,
+    error: null | DiscordErrorResponse
+}> {
+    try {
+        const { content, result } = await getGuildMember(user.id);
+        switch (result) {
             case MemberResult.Found: {
-                console.log(`User ${user.id} already exists in the guild. Adding roles...`)
-                const result = await addRoleToUser(user.id, config.discord.roles.map((val) => val.id), token, nickname);
+                const guildMember = content as RESTGetAPIGuildMemberResult;
 
-                switch (result) {
-                    case BotResult.Success:
-                        return BotResult.Success
-                    case BotResult.Error:
-                    default:
-                        return BotResult.Error
+                console.log(`User ${user.id} already exists in the guild. Adding roles...`)
+                const { result, error } = await addRoleToUser(user.id, [...guildMember.roles, ...config.discord.roles.map((val) => val.id)], token, nickname);
+                return {
+                    result,
+                    error
                 }
             }
             default:
             case MemberResult.NotFound: {
                 console.log(`User ${user.id} does not exist in the guild. Adding user...`)
-                const joinResponse = await joinDiscordServer(user, token, nickname);
-                switch (joinResponse) {
+                const { result, error } = await joinDiscordServer(user, token, nickname);
+                switch (result) {
                     case BotResult.Success: {
-                        const result = await addRoleToUser(user.id, config.discord.roles.map((val) => val.id), token, nickname);
-                        switch (result) {
-                            case BotResult.Success:
-                                return BotResult.Success
-                            default:
-                                return BotResult.Error
+                        const { result, error } = await addRoleToUser(user.id, config.discord.roles.map((val) => val.id), token, nickname);
+                        return {
+                            result,
+                            error
                         }
                     }
-                    case BotResult.Full:
-                        return BotResult.Full
-                    default:
-                        return BotResult.Error
+                    default: {
+                        return {
+                            result,
+                            error
+                        }
+                    }
                 }
             }
         }
     } catch (e) {
         console.log(e);
-        return BotResult.Error
+        return {
+            result: BotResult.Error,
+            error: {
+                code: -5000,
+                message: "Network Error"
+            }
+        }
     }
 }
 
-async function joinDiscordServer(user: User, token: string, nickname: string): Promise<BotResult> {
+async function joinDiscordServer(user: DiscordOAuth2User, token: string, nickname: string): Promise<{
+    result: BotResult,
+    error: null | DiscordErrorResponse
+}> {
     try {
         // Join user to the discord server.
         const response = await fetch(`https://discord.com/api/v10/guilds/${config.discord.guildId}/members/${user.id}`, {
@@ -136,7 +125,7 @@ async function joinDiscordServer(user: User, token: string, nickname: string): P
             },
         });
 
-        const json: Record<string, unknown> | DiscordErrorResponse = await response.json()
+        const json: RESTGetAPIGuildMemberResult | DiscordErrorResponse = await response.json()
 
         // Check if user already exists in the server.
         switch (response.status) {
@@ -148,30 +137,42 @@ async function joinDiscordServer(user: User, token: string, nickname: string): P
                 break;
             case 400: {
                 console.log(`${user.id} - ${user.username} has reached maximum guilds.`);
-                return BotResult.Full;
+                return {
+                    result: BotResult.Full,
+                    error: json as DiscordErrorResponse
+                };
             }
             case 403:
             default: {
                 const errRes = json as DiscordErrorResponse;
                 console.log(`Error joining ${user.id} to server!: ${response.status}: ${response.statusText} ${errRes.code} ${errRes.message}`);
-                return BotResult.Error
+                return {
+                    result: BotResult.Error,
+                    error: errRes
+                }
             }
         }
 
-        return BotResult.Success;
+        return {
+            result: BotResult.Success,
+            error: null
+        }
     } catch (e) {
         console.log(e);
-        return BotResult.Error;
+        return {
+            result: BotResult.Error,
+            error: {
+                code: -5000,
+                message: "Network Error"
+            }
+        }
     }
 }
 
-enum MemberResult {
-    Found,
-    NotFound,
-    Error
-}
-
-async function userExistsInGuild(id: string): Promise<MemberResult> {
+async function getGuildMember(id: string): Promise<{
+    content: RESTGetAPIGuildMemberResult | DiscordErrorResponse,
+    result: MemberResult
+}> {
     try {
         const response = await fetch(`https://discord.com/api/v10/guilds/${config.discord.guildId}/members/${id}`, {
             method: 'GET',
@@ -181,27 +182,45 @@ async function userExistsInGuild(id: string): Promise<MemberResult> {
             },
         });
 
-        const json: Record<string, unknown> | DiscordErrorResponse = await response.json()
+        const json: RESTGetAPIGuildMemberResult | DiscordErrorResponse = await response.json()
 
         switch (response.status) {
             case 200:
-                return MemberResult.Found
+                return {
+                    content: json as RESTGetAPIGuildMemberResult,
+                    result: MemberResult.Found
+                };
             case 404:
                 console.log(`User ${id} not found in guild.`);
-                return MemberResult.NotFound
+                return {
+                    content: json as DiscordErrorResponse,
+                    result: MemberResult.NotFound
+                }
             default: {
-                const errRes = json as DiscordErrorResponse;
+                const errRes = json as DiscordErrorResponse
                 console.log(`Error checking if user ${id} exists in guild: ${response.status}: ${response.statusText} ${errRes.code} ${errRes.message}`)
-                return MemberResult.Error;   
+                return {
+                    content: errRes,
+                    result: MemberResult.Error
+                }
             }
         }
     } catch (e) {
         console.error(e);
-        return MemberResult.Error
+        return {
+            content: {
+                code: -5000,
+                message: 'Network error'
+            },
+            result: MemberResult.Error
+        }
     }
 }
 
-async function addRoleToUser(userId: string, roles: string[], token: string, nick: string): Promise<BotResult> {
+async function addRoleToUser(userId: string, roles: string[], token: string, nick: string): Promise<{
+    result: BotResult,
+    error: null | DiscordErrorResponse
+}> {
     const response = await fetch(`https://discord.com/api/v10/guilds/${config.discord.guildId}/members/${userId}`, {
         body: JSON.stringify({
             access_token: token,
@@ -218,13 +237,19 @@ async function addRoleToUser(userId: string, roles: string[], token: string, nic
     switch (response.status) {
         case 200:
         case 204:
-            return BotResult.Success
+            return {
+                result: BotResult.Success,
+                error: null
+            }
         case 400:
         case 404:
         default: {
             const errRes: DiscordErrorResponse = await response.json()
             console.log(`Error adding role to user ${userId}: ${response.status}: ${response.statusText} ${errRes.code} ${errRes.message}`)
-            return BotResult.Error
+            return {
+                result: BotResult.Error,
+                error: errRes
+            }
         }
     }
 }
@@ -298,14 +323,14 @@ export const GET = (async ({ url, locals }) => {
     const meData: DiscordData = await getUserData(tokens);
     console.log(`User ${meData.user.id} ${meData.user.username}#${meData.user.discriminator} has logged in using discord`);
 
-    await locals.session.update((data) => { 
+    await locals.session.update((data) => {
         data.discord = {
             id: meData.user.id
         }
         return data;
     });
 
-    const result: BotResult = await setupUser(meData.user, tokens.access_token, locals.session.data.osu?.username ?? '');
+    const { result, error } = await setupUser(meData.user, tokens.access_token, locals.session.data.osu?.username ?? '');
     console.log(`User ${meData.user.id} ${meData.user.username}#${meData.user.discriminator} received: ${BotResult[result]}`);
 
     if (result === BotResult.Full) {
@@ -316,6 +341,7 @@ export const GET = (async ({ url, locals }) => {
 
         throw redirect(302, '/');
     } else if (result === BotResult.Error) {
+        console.error(`Redirecting user due to API side error: ${error}`);
         await locals.session.update((data) => {
             data.error = "An unknown error occured while trying to join the server."
             return data;
