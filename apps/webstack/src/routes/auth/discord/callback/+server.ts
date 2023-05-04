@@ -72,11 +72,17 @@ interface User {
     public_flags: number;
 }
 
+interface DiscordErrorResponse {
+    code: number;
+    message: string;
+}
+
 async function setupUser(user: User, token: string, nickname: string): Promise<BotResult> {
-    try {
-        const existsResponse = await userExistsInGuild(user.id)
+    try {        
+        const existsResponse = await userExistsInGuild(user.id);
         switch (existsResponse) {
             case MemberResult.Found: {
+                console.log(`User ${user.id} already exists in the guild. Adding roles...`)
                 const result = await addRoleToUser(user.id, config.discord.roles.map((val) => val.id), token, nickname);
 
                 switch (result) {
@@ -89,6 +95,7 @@ async function setupUser(user: User, token: string, nickname: string): Promise<B
             }
             default:
             case MemberResult.NotFound: {
+                console.log(`User ${user.id} does not exist in the guild. Adding user...`)
                 const joinResponse = await joinDiscordServer(user, token, nickname);
                 switch (joinResponse) {
                     case BotResult.Success: {
@@ -129,6 +136,8 @@ async function joinDiscordServer(user: User, token: string, nickname: string): P
             },
         });
 
+        const json: Record<string, unknown> | DiscordErrorResponse = await response.json()
+
         // Check if user already exists in the server.
         switch (response.status) {
             case 201:
@@ -142,8 +151,11 @@ async function joinDiscordServer(user: User, token: string, nickname: string): P
                 return BotResult.Full;
             }
             case 403:
-            default:
+            default: {
+                const errRes = json as DiscordErrorResponse;
+                console.log(`Error joining ${user.id} to server!: ${response.status}: ${response.statusText} ${errRes.code} ${errRes.message}`);
                 return BotResult.Error
+            }
         }
 
         return BotResult.Success;
@@ -169,12 +181,19 @@ async function userExistsInGuild(id: string): Promise<MemberResult> {
             },
         });
 
+        const json: Record<string, unknown> | DiscordErrorResponse = await response.json()
+
         switch (response.status) {
             case 200:
                 return MemberResult.Found
             case 404:
-            default:
+                console.log(`User ${id} not found in guild.`);
                 return MemberResult.NotFound
+            default: {
+                const errRes = json as DiscordErrorResponse;
+                console.log(`Error checking if user ${id} exists in guild: ${response.status}: ${response.statusText} ${errRes.code} ${errRes.message}`)
+                return MemberResult.Error;   
+            }
         }
     } catch (e) {
         console.error(e);
@@ -196,16 +215,17 @@ async function addRoleToUser(userId: string, roles: string[], token: string, nic
         },
     });
 
-    console.log(response.status);
-
     switch (response.status) {
         case 200:
         case 204:
             return BotResult.Success
         case 400:
         case 404:
-        default:
+        default: {
+            const errRes: DiscordErrorResponse = await response.json()
+            console.log(`Error adding role to user ${userId}: ${response.status}: ${response.statusText} ${errRes.code} ${errRes.message}`)
             return BotResult.Error
+        }
     }
 }
 
@@ -272,11 +292,21 @@ export const GET = (async ({ url, locals }) => {
         return Response.redirect('/');
     }
 
+    console.log('Code received, getting tokens...')
     const tokens = await getOAuthTokens(code);
 
     const meData: DiscordData = await getUserData(tokens);
+    console.log(`User ${meData.user.id} ${meData.user.username}#${meData.user.discriminator} has logged in using discord`);
+
+    await locals.session.update((data) => { 
+        data.discord = {
+            id: meData.user.id
+        }
+        return data;
+    });
 
     const result: BotResult = await setupUser(meData.user, tokens.access_token, locals.session.data.osu?.username ?? '');
+    console.log(`User ${meData.user.id} ${meData.user.username}#${meData.user.discriminator} received: ${BotResult[result]}`);
 
     if (result === BotResult.Full) {
         await locals.session.update((data) => {
