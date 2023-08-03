@@ -40,10 +40,10 @@ importers:
         version: 1.31.2
       '@sveltejs/adapter-node':
         specifier: ^1.2.1
-        version: 1.2.1(@sveltejs/kit@1.10.0)
+        version: 1.2.1(@sveltejs/kit@1.15.2)
       '@sveltejs/kit':
-        specifier: ^1.0.0
-        version: 1.10.0(svelte@3.55.1)(vite@4.1.4)
+        specifier: ^1.15.2
+        version: 1.15.2(svelte@3.55.1)(vite@4.1.4)
       '@typescript-eslint/eslint-plugin':
         specifier: ^5.45.0
         version: 5.54.1(@typescript-eslint/parser@5.54.1)(eslint@8.35.0)(typescript@4.9.5)
@@ -468,7 +468,7 @@ packages:
     engines: {node: '>=14.16'}
     dev: false
 
-  /@sveltejs/adapter-node@1.2.1(@sveltejs/kit@1.10.0):
+  /@sveltejs/adapter-node@1.2.1(@sveltejs/kit@1.15.2):
     resolution: {integrity: sha512-mEGDCaZVU3qvFdUI8CMKv+BSzpBYpTpcx85u8bfJ+vcv57pu4UXjZg7ivOoxWZdunUeqq4oEyE+kHmlgBRAalg==}
     peerDependencies:
       '@sveltejs/kit': ^1.0.0
@@ -476,12 +476,12 @@ packages:
       '@rollup/plugin-commonjs': 24.0.1(rollup@3.18.0)
       '@rollup/plugin-json': 6.0.0(rollup@3.18.0)
       '@rollup/plugin-node-resolve': 15.0.1(rollup@3.18.0)
-      '@sveltejs/kit': 1.10.0(svelte@3.55.1)(vite@4.1.4)
+      '@sveltejs/kit': 1.15.2(svelte@3.55.1)(vite@4.1.4)
       rollup: 3.18.0
     dev: true
 
-  /@sveltejs/kit@1.10.0(svelte@3.55.1)(vite@4.1.4):
-    resolution: {integrity: sha512-0P35zHrByfbF3Ym3RdQL+RvzgsCDSyO3imSwuZ67XAD5HoCQFF3a8Mhh0V3sObz3rc5aJd4Qn82UpAihJqZ6gQ==}
+  /@sveltejs/kit@1.15.2(svelte@3.55.1)(vite@4.1.4):
+    resolution: {integrity: sha512-rLNxZrjbrlPf8AWW8GAU4L/Vvu17e9v8EYl7pUip7x72lTft7RcxeP3z7tsrHpMSBBxC9o4XdKzFvz1vMZyXZw==}
     engines: {node: ^16.14 || >=18}
     hasBin: true
     requiresBuild: true
