@@ -61,7 +61,7 @@ export const GET = (async ({ url, locals }) => {
             osu: {
                 id: meData.id.toString(),
                 username: meData.username,
-                joinDate: DateTime.fromISO(meData.join_date)
+                joinDate: new Date(meData.join_date)
             }
         });
 

@@ -24,7 +24,7 @@ interface SessionData {
 	osu?: {
 		id?: string;
 		username?: string;
-		joinDate: luxon.DateTime
+		joinDate: Date
 	}
 	discord?: {
 		id?: string;
