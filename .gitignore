@@ -83,3 +83,4 @@ build/
 config.json
 *out
 docker-compose-staging.yml
+apps/webstack/.vercel
