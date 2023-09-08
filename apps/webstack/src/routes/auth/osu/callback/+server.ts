@@ -2,7 +2,6 @@ import { env } from '$env/dynamic/private';
 import { env as pubEnv } from '$env/dynamic/public';
 import { redirect } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
-import { DateTime } from "luxon";
 import { isUserEligible } from 'config';
 import type { OsuUser } from '$lib/OsuUser';
 
@@ -75,7 +74,12 @@ export const GET = (async ({ url, locals }) => {
         }
 
         await locals.session.update((data) => {
-            data.error = `osu! account is not older than 6 months yet (account age is ${DateTime.fromISO(meData.join_date).toISODate()})`
+            if (!data.osu) {
+                data.error = "Error reading osu! profile data"
+                return data;
+            }
+
+            data.error = `osu! account is not older than 6 months yet (account age is ${data.osu.joinDate.toUTCString()})`
             return data;
         });
 

@@ -196,8 +196,6 @@ async function addRoleToUser(userId: string, roles: string[], token: string, nic
         },
     });
 
-    console.log(response.status);
-
     switch (response.status) {
         case 200:
         case 204:
