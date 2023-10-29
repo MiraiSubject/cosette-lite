@@ -324,13 +324,6 @@ export const GET = (async ({ url, locals }) => {
     console.log(`User ${meData.user.id} ${meData.user.username}#${meData.user.discriminator} has logged in using discord`);
 
     await locals.session.update((data) => {
-        data.discord = {
-            id: meData.user.id
-        }
-        return data;
-    });
-
-    await locals.session.update((data) => {
         if (!data.discord)
             return data;
         
@@ -339,7 +332,6 @@ export const GET = (async ({ url, locals }) => {
     })
 
     const result: BotResult = await setupUser(meData.user, tokens.access_token, locals.session.data.osu?.username ?? '');
-    console.log(`User ${meData.user.id} ${meData.user.username}#${meData.user.discriminator} received: ${BotResult[result]}`);
 
     if (result === BotResult.Full) {
         await locals.session.update((data) => {
