@@ -274,6 +274,14 @@ export const GET = (async ({ url, locals }) => {
 
     const meData: DiscordData = await getUserData(tokens);
 
+    await locals.session.update((data) => {
+        if (!data.discord)
+            return data;
+        
+        data.discord.id = meData.user.id;
+        return data;
+    })
+
     const result: BotResult = await setupUser(meData.user, tokens.access_token, locals.session.data.osu?.username ?? '');
 
     if (result === BotResult.Full) {
@@ -292,7 +300,7 @@ export const GET = (async ({ url, locals }) => {
         throw redirect(302, '/');
     }
 
-    sendMessageToWelcomeChannel.call(this, locals.session.data);
+    sendMessageToWelcomeChannel(locals.session.data);
 
     console.log(`Discord User joined: ${meData.user.id} - ${meData.user.username}`);
 
