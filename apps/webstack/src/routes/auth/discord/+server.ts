@@ -26,7 +26,7 @@ export const GET = (async ({ locals }) => {
             error: "Error saving data to cookie, please delete the cookies for this site and clear the cache."
         });
 
-        throw redirect(302, '/');
+        redirect(302, '/');
     }
 
     const { state, url } = getOAuthUrl();

@@ -95,6 +95,6 @@ export const GET = (async ({ url, locals }) => {
             error: "Error reading osu! profile data"
         });
 
-        throw redirect(302, '/');
+        redirect(302, '/');
     }
 }) satisfies RequestHandler;

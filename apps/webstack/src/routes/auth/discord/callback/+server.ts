@@ -340,7 +340,7 @@ export const GET = (async ({ url, locals }) => {
             return data;
         });
 
-        throw redirect(302, '/');
+        redirect(302, '/');
     } else if (result === BotResult.Error) {
         console.error(`Redirecting user due to API side error: ${error?.code}; ${error?.message}`);
         await locals.session.update((data) => {
@@ -348,12 +348,12 @@ export const GET = (async ({ url, locals }) => {
             return data;
         });
 
-        throw redirect(302, '/');
+        redirect(302, '/');
     }
 
     sendMessageToWelcomeChannel(locals.session.data);
 
     console.log(`Discord User joined: ${meData.user.id} - ${meData.user.username}`);
 
-    throw redirect(302, '/done');
+    redirect(302, '/done');
 }) satisfies RequestHandler;
