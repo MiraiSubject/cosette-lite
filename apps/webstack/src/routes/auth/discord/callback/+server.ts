@@ -342,7 +342,7 @@ export const GET = (async ({ url, locals }) => {
 
         throw redirect(302, '/');
     } else if (result === BotResult.Error) {
-        console.error(`Redirecting user due to API side error: ${error}`);
+        console.error(`Redirecting user due to API side error: ${error?.code}; ${error?.message}`);
         await locals.session.update((data) => {
             data.error = "An unknown error occured while trying to join the server."
             return data;
