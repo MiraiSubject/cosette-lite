@@ -326,12 +326,13 @@ export const GET = (async ({ url, locals }) => {
     await locals.session.update((data) => {
         if (!data.discord)
             return data;
-        
+
         data.discord.id = meData.user.id;
         return data;
-    })
+    });
 
-    const result: BotResult = await setupUser(meData.user, tokens.access_token, locals.session.data.osu?.username ?? '');
+    const { result, error } = await setupUser(meData.user, tokens.access_token, locals.session.data.osu?.username ?? '');
+    console.log(`User ${meData.user.id} ${meData.user.username}#${meData.user.discriminator} received: ${BotResult[result]}`);
 
     if (result === BotResult.Full) {
         await locals.session.update((data) => {
