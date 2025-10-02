@@ -2,8 +2,12 @@
 	import type { ITournamentConfig } from "config";
 	import type { PageData } from './$types';
 
-	export let data: PageData;
-	export let config: ITournamentConfig = data.config;
+	interface Props {
+		data: PageData;
+		config?: ITournamentConfig;
+	}
+
+	let { data, config = data.config }: Props = $props();
 </script>
 
 
