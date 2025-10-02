@@ -3,6 +3,7 @@ import { env as pubEnv } from '$env/dynamic/public';
 import { redirect } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { config } from 'config';
+import { logger } from '$lib/logger';
 import { BotResult } from '$lib/DiscordTypes';
 import type { DiscordOAuth2User, DiscordData, DiscordErrorResponse } from '$lib/DiscordTypes';
 import type { RESTGetAPIGuildMemberResult } from 'discord-api-types/rest'
@@ -66,7 +67,7 @@ async function setupUser(user: DiscordOAuth2User, token: string, nickname: strin
             case MemberResult.Found: {
                 const guildMember = content as RESTGetAPIGuildMemberResult;
 
-                console.log(`User ${user.id} already exists in the guild. Adding roles...`)
+                logger.info(`User ${user.id} already exists in the guild. Adding roles...`)
 					const requiredRoles = config.discord.roles.map((val) => val.id);
 					const mergedRoles = Array.from(new Set([...guildMember.roles, ...requiredRoles]));
 					const unchanged = mergedRoles.length === guildMember.roles.length && guildMember.roles.every((id) => mergedRoles.includes(id));
@@ -85,7 +86,7 @@ async function setupUser(user: DiscordOAuth2User, token: string, nickname: strin
             }
             default:
             case MemberResult.NotFound: {
-                console.log(`User ${user.id} does not exist in the guild. Adding user...`)
+                logger.info(`User ${user.id} does not exist in the guild. Adding user...`)
                 const { result, error } = await joinDiscordServer(user, token, nickname);
                 switch (result) {
                     case BotResult.Success: {
@@ -141,13 +142,13 @@ async function joinDiscordServer(user: DiscordOAuth2User, token: string, nicknam
         // Check if user already exists in the server.
         switch (response.status) {
             case 201:
-                console.log(`${user.username}(${user.id}) joined to server.`);
+                logger.info(`${user.username}(${user.id}) joined to server.`);
                 break;
             case 204:
-                console.log(`${user.username}(${user.id}) is already in the guild.`);
+                logger.info(`${user.username}(${user.id}) is already in the guild.`);
                 break;
             case 400: {
-                console.log(`${user.username}(${user.id}) has reached maximum guilds.`);
+                logger.warn(`${user.username}(${user.id}) has reached maximum guilds.`);
                 return {
                     result: BotResult.Full,
                     error: json as DiscordErrorResponse
@@ -156,7 +157,7 @@ async function joinDiscordServer(user: DiscordOAuth2User, token: string, nicknam
             case 403:
             default: {
                 const errRes = json as DiscordErrorResponse;
-                console.log(`Error joining ${user.id} to server!: ${response.status}: ${response.statusText} ${errRes.code} ${errRes.message}`);
+                logger.error(`Error joining ${user.id} to server!: ${response.status}: ${response.statusText} ${errRes.code} ${errRes.message}`);
                 return {
                     result: BotResult.Error,
                     error: errRes
@@ -202,14 +203,14 @@ async function getGuildMember(id: string): Promise<{
                     result: MemberResult.Found
                 };
             case 404:
-                console.log(`User ${id} not found in guild.`);
+                logger.info(`User ${id} not found in guild.`);
                 return {
                     content: json as DiscordErrorResponse,
                     result: MemberResult.NotFound
                 }
             default: {
                 const errRes = json as DiscordErrorResponse
-                console.log(`Error checking if user ${id} exists in guild: ${response.status}: ${response.statusText} ${errRes.code} ${errRes.message}`)
+                logger.error(`Error checking if user ${id} exists in guild: ${response.status}: ${response.statusText} ${errRes.code} ${errRes.message}`)
                 return {
                     content: errRes,
                     result: MemberResult.Error
@@ -255,7 +256,7 @@ async function addRoleToUser(userId: string, roles: string[], token: string, nic
         case 404:
         default: {
             const errRes: DiscordErrorResponse = await response.json()
-            console.log(`Error adding role to user ${userId}: ${response.status}: ${response.statusText} ${errRes.code} ${errRes.message}`)
+            logger.error(`Error adding role to user ${userId}: ${response.status}: ${response.statusText} ${errRes.code} ${errRes.message}`)
             return {
                 result: BotResult.Error,
                 error: errRes
@@ -327,11 +328,11 @@ export const GET = (async ({ url, locals }) => {
         return Response.redirect('/');
     }
 
-    console.log('Code received, getting tokens...')
+    logger.info('Code received, getting tokens...')
     const tokens = await getOAuthTokens(code);
 
     const meData: DiscordData = await getUserData(tokens);
-    console.log(`User ${meData.user.id} ${meData.user.username}#${meData.user.discriminator} has logged in using discord`);
+    logger.info(`User ${meData.user.id} ${meData.user.username}#${meData.user.discriminator} has logged in using discord`);
 
     await locals.session.update((data) => {
         if (!data.discord)
@@ -342,7 +343,7 @@ export const GET = (async ({ url, locals }) => {
     });
 
     const { result, error } = await setupUser(meData.user, tokens.access_token, locals.session.data.osu?.username ?? '');
-    console.log(`User ${meData.user.id} ${meData.user.username}#${meData.user.discriminator} received: ${BotResult[result]}`);
+    logger.info(`User ${meData.user.id} ${meData.user.username}#${meData.user.discriminator} received: ${BotResult[result]}`);
 
     if (result === BotResult.Full) {
         await locals.session.update((data) => {
@@ -352,7 +353,7 @@ export const GET = (async ({ url, locals }) => {
 
         redirect(302, '/');
     } else if (result === BotResult.Error) {
-        console.error(`Redirecting user due to API side error: ${error?.code}; ${error?.message}`);
+        logger.error(`Redirecting user due to API side error: ${error?.code}; ${error?.message}`);
         await locals.session.update((data) => {
             data.error = "An unknown error occured while trying to join the server."
             return data;
@@ -363,7 +364,7 @@ export const GET = (async ({ url, locals }) => {
 
     sendMessageToWelcomeChannel(locals.session.data);
 
-    console.log(`Discord User joined: ${meData.user.id} - ${meData.user.username}`);
+    logger.info(`Discord User joined: ${meData.user.id} - ${meData.user.username}`);
 
     redirect(302, '/done');
 }) satisfies RequestHandler;

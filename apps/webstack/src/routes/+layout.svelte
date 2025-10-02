@@ -5,6 +5,15 @@
 	}
 
 	let { children }: Props = $props();
+
+	if (typeof window !== 'undefined' && import.meta.env.PROD) {
+		const flagKey = '__withTimestamp';
+		const c = console as any;
+		if (!c[flagKey]) {
+			c[flagKey] = true;
+			const methodNames = ['log', 'info', 'warn', 'error', 'debug'] as const;
+		}
+	}
 </script>
 
 <div class="start">
