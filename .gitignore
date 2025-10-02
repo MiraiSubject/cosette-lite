@@ -86,3 +86,4 @@ docker-compose-staging.yml
 apps/webstack/.vercel
 .turbo
 apps/webstack/.vercel
+.wrangler

@@ -342,29 +342,16 @@ export const GET = (async ({ url, locals }) => {
         return data;
     });
 
-    const { result, error } = await setupUser(meData.user, tokens.access_token, locals.session.data.osu?.username ?? '');
-    logger.info(`User ${meData.user.id} ${meData.user.username}#${meData.user.discriminator} received: ${BotResult[result]}`);
+    await locals.session.update((data) => {
+        if (!data.discord)
+            data.discord = {};
+        data.discord.id = meData.user.id;
+        (data.discord as any).accessToken = tokens.access_token;
+        (data as any).isReady = false;
+        return data;
+    });
 
-    if (result === BotResult.Full) {
-        await locals.session.update((data) => {
-            data.error = "You have joined the maxmium amount of servers. Please leave a server before trying to rejoin this one."
-            return data;
-        });
+    logger.info(`Prepared setup for user  ${meData.user.username} ${meData.user.id}`);
 
-        redirect(302, '/');
-    } else if (result === BotResult.Error) {
-        logger.error(`Redirecting user due to API side error: ${error?.code}; ${error?.message}`);
-        await locals.session.update((data) => {
-            data.error = "An unknown error occured while trying to join the server."
-            return data;
-        });
-
-        redirect(302, '/');
-    }
-
-    sendMessageToWelcomeChannel(locals.session.data);
-
-    logger.info(`Discord User joined: ${meData.user.id} - ${meData.user.username}`);
-
-    redirect(302, '/done');
+    redirect(302, '/loading');
 }) satisfies RequestHandler;

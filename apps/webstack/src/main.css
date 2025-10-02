@@ -99,3 +99,18 @@ a {
 .text-centered {
     text-align: center;
 }
+
+.spinner {
+    width: 56px;
+    height: 56px;
+    border: 6px solid rgba(0,0,0,0.15);
+    border-top-color: #5865f2;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 1rem auto 2rem auto;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}

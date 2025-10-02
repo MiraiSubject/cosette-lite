@@ -29,7 +29,9 @@ interface SessionData {
 	discord?: {
 		id?: string;
 		state?: string;
+		accessToken?: string;
 	}
 	error?: string;
+	isReady?: boolean;
 }
 
