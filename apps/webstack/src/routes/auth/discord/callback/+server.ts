@@ -67,7 +67,17 @@ async function setupUser(user: DiscordOAuth2User, token: string, nickname: strin
                 const guildMember = content as RESTGetAPIGuildMemberResult;
 
                 console.log(`User ${user.id} already exists in the guild. Adding roles...`)
-                const { result, error } = await addRoleToUser(user.id, [...guildMember.roles, ...config.discord.roles.map((val) => val.id)], token, nickname);
+					const requiredRoles = config.discord.roles.map((val) => val.id);
+					const mergedRoles = Array.from(new Set([...guildMember.roles, ...requiredRoles]));
+					const unchanged = mergedRoles.length === guildMember.roles.length && guildMember.roles.every((id) => mergedRoles.includes(id));
+					if (unchanged) {
+						return {
+							result: BotResult.Success,
+							error: null
+						}
+					}
+
+					const { result, error } = await addRoleToUser(user.id, mergedRoles, token, nickname);
                 return {
                     result,
                     error
@@ -79,7 +89,8 @@ async function setupUser(user: DiscordOAuth2User, token: string, nickname: strin
                 const { result, error } = await joinDiscordServer(user, token, nickname);
                 switch (result) {
                     case BotResult.Success: {
-                        const { result, error } = await addRoleToUser(user.id, config.discord.roles.map((val) => val.id), token, nickname);
+							const requiredRoles = config.discord.roles.map((val) => val.id);
+							const { result, error } = await addRoleToUser(user.id, requiredRoles, token, nickname);
                         return {
                             result,
                             error
@@ -130,13 +141,13 @@ async function joinDiscordServer(user: DiscordOAuth2User, token: string, nicknam
         // Check if user already exists in the server.
         switch (response.status) {
             case 201:
-                console.log(`Joined ${user.id} to server!`);
+                console.log(`${user.username}(${user.id}) joined to server.`);
                 break;
             case 204:
-                console.log(`User is already in the guild.`);
+                console.log(`${user.username}(${user.id}) is already in the guild.`);
                 break;
             case 400: {
-                console.log(`${user.id} - ${user.username} has reached maximum guilds.`);
+                console.log(`${user.username}(${user.id}) has reached maximum guilds.`);
                 return {
                     result: BotResult.Full,
                     error: json as DiscordErrorResponse
@@ -223,7 +234,6 @@ async function addRoleToUser(userId: string, roles: string[], token: string, nic
 }> {
     const response = await fetch(`https://discord.com/api/v10/guilds/${config.discord.guildId}/members/${userId}`, {
         body: JSON.stringify({
-            access_token: token,
             nick,
             roles
         }),
