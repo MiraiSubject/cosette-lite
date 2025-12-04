@@ -67,13 +67,14 @@ async function joinDiscordServer(userId: string, accessToken: string, nickname: 
     }
 }
 
-async function addRoleToUser(userId: string, roles: string[], nick: string) {
+async function modifyGuildMember(userId: string, nick: string, roles?: string[]) {
     const response = await fetch(`https://discord.com/api/v10/guilds/${config.discord.guildId}/members/${userId}`, {
         body: JSON.stringify({ nick, roles }),
         method: 'PATCH',
         headers: {
             "Content-Type": "application/json",
-            "Authorization": `Bot ${env.DISCORD_BOT_TOKEN}`
+            "Authorization": `Bot ${env.DISCORD_BOT_TOKEN}`,
+            "X-Audit-Log-Reason": `Updated user ${userId} from cosette`,
         },
     });
 
@@ -96,39 +97,43 @@ export const POST = (async ({ locals }) => {
     }
 
     const memberCheck = await getGuildMember(discordId);
+
     if (memberCheck.result === MemberResult.Found) {
         logger.info(`User ${discordId} already exists in the guild. Adding roles...`);
+
         const requiredRoles = config.discord.roles.map((val) => val.id);
         const guildMember = memberCheck.content as { roles: string[] };
         const mergedRoles = Array.from(new Set([...(guildMember.roles || []), ...requiredRoles]));
-        const unchanged = mergedRoles.length === (guildMember.roles || []).length && (guildMember.roles || []).every((id: string) => mergedRoles.includes(id));
-        if (unchanged) {
-            await locals.session.update((d) => { (d as any).isReady = true; return d; });
-            return new Response(JSON.stringify({ result: 'success' }));
-        }
-        const addRoleRes = await addRoleToUser(discordId, requiredRoles, osuUsername);
+        const addRoleRes = await modifyGuildMember(discordId, osuUsername, mergedRoles);
+
         if (addRoleRes.result === BotResult.Success) {
             await locals.session.update((d) => { (d as any).isReady = true; return d; });
             return new Response(JSON.stringify({ result: 'success' }));
         }
+
         return new Response(JSON.stringify({ result: 'error', message: addRoleRes.error?.message || 'Failed adding roles' }), { status: 500 });
     }
 
     if (memberCheck.result === MemberResult.NotFound) {
         const joinRes = await joinDiscordServer(discordId, accessToken, osuUsername);
+
         if (joinRes.result === BotResult.Full) {
             await locals.session.update((d) => { d.error = 'You have joined the maximum amount of servers.'; return d; });
             return new Response(JSON.stringify({ result: 'full' }), { status: 200 });
         }
+
         if (joinRes.result !== BotResult.Success) {
             return new Response(JSON.stringify({ result: 'error', message: joinRes.error?.message || 'Failed to join server' }), { status: 500 });
         }
+
         const requiredRoles = config.discord.roles.map((val) => val.id);
-        const addRoleRes = await addRoleToUser(discordId, requiredRoles, osuUsername);
+        const addRoleRes = await modifyGuildMember(discordId, osuUsername, requiredRoles);
+
         if (addRoleRes.result === BotResult.Success) {
             await locals.session.update((d) => { (d as any).isReady = true; return d; });
             return new Response(JSON.stringify({ result: 'success' }));
         }
+
         return new Response(JSON.stringify({ result: 'error', message: addRoleRes.error?.message || 'Failed adding roles' }), { status: 500 });
     }
 
