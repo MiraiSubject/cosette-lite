@@ -2,17 +2,8 @@ import { env } from '$env/dynamic/private';
 import { env as pubEnv } from '$env/dynamic/public';
 import { redirect } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
-import { config } from 'config';
 import { logger } from '$lib/logger';
-import { BotResult } from '$lib/DiscordTypes';
-import type { DiscordOAuth2User, DiscordData, DiscordErrorResponse } from '$lib/DiscordTypes';
-import type { RESTGetAPIGuildMemberResult } from 'discord-api-types/rest'
-
-enum MemberResult {
-    Found,
-    NotFound,
-    Error
-}
+import type { DiscordData } from '$lib/DiscordTypes';
 
 async function getOAuthTokens(code: string) {
     const url = 'https://discord.com/api/v10/oauth2/token';
@@ -57,250 +48,6 @@ async function getUserData(tokens: {
     }
 }
 
-async function setupUser(user: DiscordOAuth2User, token: string, nickname: string): Promise<{
-    result: BotResult,
-    error: null | DiscordErrorResponse
-}> {
-    try {
-        const { content, result } = await getGuildMember(user.id);
-        switch (result) {
-            case MemberResult.Found: {
-                const guildMember = content as RESTGetAPIGuildMemberResult;
-
-                logger.info(`User ${user.id} already exists in the guild. Adding roles...`)
-					const requiredRoles = config.discord.roles.map((val) => val.id);
-					const mergedRoles = Array.from(new Set([...guildMember.roles, ...requiredRoles]));
-					const unchanged = mergedRoles.length === guildMember.roles.length && guildMember.roles.every((id) => mergedRoles.includes(id));
-					if (unchanged) {
-						return {
-							result: BotResult.Success,
-							error: null
-						}
-					}
-
-					const { result, error } = await addRoleToUser(user.id, mergedRoles, token, nickname);
-                return {
-                    result,
-                    error
-                }
-            }
-            default:
-            case MemberResult.NotFound: {
-                logger.info(`User ${user.id} does not exist in the guild. Adding user...`)
-                const { result, error } = await joinDiscordServer(user, token, nickname);
-                switch (result) {
-                    case BotResult.Success: {
-							const requiredRoles = config.discord.roles.map((val) => val.id);
-							const { result, error } = await addRoleToUser(user.id, requiredRoles, token, nickname);
-                        return {
-                            result,
-                            error
-                        }
-                    }
-                    default: {
-                        return {
-                            result,
-                            error
-                        }
-                    }
-                }
-            }
-        }
-    } catch (e) {
-        console.log(e);
-        return {
-            result: BotResult.Error,
-            error: {
-                code: -5000,
-                message: "Network Error"
-            }
-        }
-    }
-}
-
-async function joinDiscordServer(user: DiscordOAuth2User, token: string, nickname: string): Promise<{
-    result: BotResult,
-    error: null | DiscordErrorResponse
-}> {
-    try {
-        // Join user to the discord server.
-        const response = await fetch(`https://discord.com/api/v10/guilds/${config.discord.guildId}/members/${user.id}`, {
-            body: JSON.stringify({
-                access_token: token,
-                nick: nickname,
-                roles: config.discord.roles.map((val) => val.id)
-            }),
-            method: 'PUT',
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": `Bot ${env.DISCORD_BOT_TOKEN}`
-            },
-        });
-
-        const json: RESTGetAPIGuildMemberResult | DiscordErrorResponse = await response.json()
-
-        // Check if user already exists in the server.
-        switch (response.status) {
-            case 201:
-                logger.info(`${user.username}(${user.id}) joined to server.`);
-                break;
-            case 204:
-                logger.info(`${user.username}(${user.id}) is already in the guild.`);
-                break;
-            case 400: {
-                logger.warn(`${user.username}(${user.id}) has reached maximum guilds.`);
-                return {
-                    result: BotResult.Full,
-                    error: json as DiscordErrorResponse
-                };
-            }
-            case 403:
-            default: {
-                const errRes = json as DiscordErrorResponse;
-                logger.error(`Error joining ${user.id} to server!: ${response.status}: ${response.statusText} ${errRes.code} ${errRes.message}`);
-                return {
-                    result: BotResult.Error,
-                    error: errRes
-                }
-            }
-        }
-
-        return {
-            result: BotResult.Success,
-            error: null
-        }
-    } catch (e) {
-        console.log(e);
-        return {
-            result: BotResult.Error,
-            error: {
-                code: -5000,
-                message: "Network Error"
-            }
-        }
-    }
-}
-
-async function getGuildMember(id: string): Promise<{
-    content: RESTGetAPIGuildMemberResult | DiscordErrorResponse,
-    result: MemberResult
-}> {
-    try {
-        const response = await fetch(`https://discord.com/api/v10/guilds/${config.discord.guildId}/members/${id}`, {
-            method: 'GET',
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": `Bot ${env.DISCORD_BOT_TOKEN}`
-            },
-        });
-
-        const json: RESTGetAPIGuildMemberResult | DiscordErrorResponse = await response.json()
-
-        switch (response.status) {
-            case 200:
-                return {
-                    content: json as RESTGetAPIGuildMemberResult,
-                    result: MemberResult.Found
-                };
-            case 404:
-                logger.info(`User ${id} not found in guild.`);
-                return {
-                    content: json as DiscordErrorResponse,
-                    result: MemberResult.NotFound
-                }
-            default: {
-                const errRes = json as DiscordErrorResponse
-                logger.error(`Error checking if user ${id} exists in guild: ${response.status}: ${response.statusText} ${errRes.code} ${errRes.message}`)
-                return {
-                    content: errRes,
-                    result: MemberResult.Error
-                }
-            }
-        }
-    } catch (e) {
-        console.error(e);
-        return {
-            content: {
-                code: -5000,
-                message: 'Network error'
-            },
-            result: MemberResult.Error
-        }
-    }
-}
-
-async function addRoleToUser(userId: string, roles: string[], token: string, nick: string): Promise<{
-    result: BotResult,
-    error: null | DiscordErrorResponse
-}> {
-    const response = await fetch(`https://discord.com/api/v10/guilds/${config.discord.guildId}/members/${userId}`, {
-        body: JSON.stringify({
-            nick,
-            roles
-        }),
-        method: 'PATCH',
-        headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bot ${env.DISCORD_BOT_TOKEN}`
-        },
-    });
-
-    switch (response.status) {
-        case 200:
-        case 204:
-            return {
-                result: BotResult.Success,
-                error: null
-            }
-        case 400:
-        case 404:
-        default: {
-            const errRes: DiscordErrorResponse = await response.json()
-            logger.error(`Error adding role to user ${userId}: ${response.status}: ${response.statusText} ${errRes.code} ${errRes.message}`)
-            return {
-                result: BotResult.Error,
-                error: errRes
-            }
-        }
-    }
-}
-
-async function sendMessageToWelcomeChannel(data: SessionData) {
-
-    const body = JSON.stringify({
-        content: `Welcome <@${data.discord?.id}> you are now verified!`
-        // embeds: [
-        //     {
-        //         "title": `${data.osu?.username} has joined the server!`,
-        //         "color": 2458853,
-        //         "timestamp": `${new Date().toISOString()}`,
-        //         "thumbnail": {
-        //             "url": `https://a.ppy.sh/${data.osu?.id}?428927893258930.jpeg`
-        //         },
-        //         "author": {
-        //             "name": `User sucessfully joined ${config.name}`,
-        //             "url": `${pubEnv.PUBLIC_BASE_URL}`
-        //         }
-        //     }
-        // ]
-    });
-
-    try {
-        await fetch(`https://discord.com/api/v10/channels/${config.discord.welcomeChannelId}/messages`, {
-            method: 'POST',
-            body,
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": `Bot ${env.DISCORD_BOT_TOKEN}`
-            },
-        });
-    } catch (e) {
-        console.error("Unable to send join message");
-        console.error(e)
-    }
-}
-
-// Write cookie for the state which will be used to compare later for the linked role stuff.
 export const GET = (async ({ url, locals }) => {
 
     const code = url.searchParams.get('code');
@@ -309,20 +56,20 @@ export const GET = (async ({ url, locals }) => {
     const clientState = locals.session.data.discord?.state;
 
     if (clientState !== state) {
-        console.error('State verification failed.');
+        logger.error('State verification failed.');
 
         await locals.session.update((data) => {
-            data.error = "Backend error occured."
+            data.error = "Backend error occurred.";
             return data;
         });
         return Response.redirect('/');
     }
 
     if (!code) {
-        console.error('No code provided.');
+        logger.error('No code provided.');
 
         await locals.session.update((data) => {
-            data.error = "Backend error occured."
+            data.error = "Backend error occurred.";
             return data;
         });
         return Response.redirect('/');
@@ -336,22 +83,14 @@ export const GET = (async ({ url, locals }) => {
 
     await locals.session.update((data) => {
         if (!data.discord)
-            return data;
-
-        data.discord.id = meData.user.id;
-        return data;
-    });
-
-    await locals.session.update((data) => {
-        if (!data.discord)
             data.discord = {};
         data.discord.id = meData.user.id;
-        (data.discord as any).accessToken = tokens.access_token;
-        (data as any).isReady = false;
+        data.discord.accessToken = tokens.access_token;
+        data.isReady = false;
         return data;
     });
 
-    logger.info(`Prepared setup for user  ${meData.user.username} ${meData.user.id}`);
+    logger.info(`Prepared setup for user ${meData.user.username} ${meData.user.id}`);
 
     redirect(302, '/loading');
 }) satisfies RequestHandler;

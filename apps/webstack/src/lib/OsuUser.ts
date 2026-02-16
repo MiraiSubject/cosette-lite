@@ -10,7 +10,7 @@ export interface OsuUser {
     is_supporter: boolean
     last_visit: string
     pm_friends_only: boolean
-    profile_colour?: unknown
+    profile_colour?: string | null
     username: string
     cover_url: string
     discord?: string
@@ -18,7 +18,7 @@ export interface OsuUser {
     interests: string
     join_date: string
     kudosu: Kudosu
-    location?: unknown
+    location?: string | null
     max_blocks: number
     max_friends: number
     occupation: string
@@ -26,10 +26,10 @@ export interface OsuUser {
     playstyle: string[]
     post_count: number
     profile_order: string[]
-    title?: unknown
-    title_url?: unknown
-    twitter?: unknown
-    website?: unknown
+    title?: string | null
+    title_url?: string | null
+    twitter?: string | null
+    website?: string | null
     country: Country
     cover: Cover
     account_history?: unknown[]
@@ -49,7 +49,7 @@ export interface OsuUser {
     page: Page
     pending_beatmapset_count: number
     previous_usernames?: unknown[]
-    rank_highest?: unknown
+    rank_highest?: { rank: number; updated_at: string } | null
     ranked_beatmapset_count: number
     replays_watched_counts: ReplaysWatchedCount[]
     scores_best_count: number
@@ -59,8 +59,7 @@ export interface OsuUser {
     statistics: Statistics
     support_level: number
     user_achievements: UserAchievement[]
-    rank_history?: unknown
-    rankHistory?: unknown
+    rank_history?: { mode: string; data: number[] } | null
     ranked_and_approved_beatmapset_count: number
     unranked_beatmapset_count: number
   }
@@ -76,7 +75,7 @@ export interface OsuUser {
   }
   
   export interface Cover {
-    custom_url?: unknown
+    custom_url?: string | null
     url: string
     id: string
   }
@@ -102,8 +101,8 @@ export interface OsuUser {
     count_50: number
     count_miss: number
     level: Level
-    global_rank?: unknown
-    global_rank_exp?: unknown
+    global_rank?: number | null
+    global_rank_exp?: number | null
     pp: number
     pp_exp: number
     ranked_score: number
@@ -116,7 +115,7 @@ export interface OsuUser {
     replays_watched_by_others: number
     is_ranked: boolean
     grade_counts: GradeCounts
-    country_rank?: unknown
+    country_rank?: number | null
     rank: Rank
   }
   
@@ -134,7 +133,7 @@ export interface OsuUser {
   }
   
   export interface Rank {
-    country?: unknown
+    country?: number | null
   }
   
   export interface UserAchievement {
