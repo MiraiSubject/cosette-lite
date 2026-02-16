@@ -25,10 +25,6 @@ a {
 }
 
 .flex {
-    display: -webkit-box;
-    display: -moz-box;
-    display: -ms-flexbox;
-    display: -webkit-flex;
     display: flex;
 }
 
@@ -108,6 +104,12 @@ a {
     border-radius: 50%;
     animation: spin 1s linear infinite;
     margin: 1rem auto 2rem auto;
+}
+
+@media (prefers-color-scheme: dark) {
+    .spinner {
+        border-color: rgba(255,255,255,0.15);
+    }
 }
 
 @keyframes spin {
