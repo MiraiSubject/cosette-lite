@@ -62,7 +62,7 @@ export const GET = (async ({ url, locals }) => {
             data.error = "Backend error occurred.";
             return data;
         });
-        return Response.redirect('/');
+        redirect(302, '/');
     }
 
     if (!code) {
@@ -72,7 +72,7 @@ export const GET = (async ({ url, locals }) => {
             data.error = "Backend error occurred.";
             return data;
         });
-        return Response.redirect('/');
+        redirect(302, '/');
     }
 
     logger.info('Code received, getting tokens...')

@@ -52,6 +52,14 @@ async function getUserData(tokens: {
 export const GET = (async ({ url, locals }) => {
     try {
         const code = url.searchParams.get('code');
+        const state = url.searchParams.get('state');
+        const sessionState = locals.session.data.osu?.state;
+
+        if (sessionState !== state) {
+            await locals.session.set({ error: "Invalid state. Please try again." });
+            redirect(302, '/');
+        }
+
         if (!code) throw new Error('No code provided');
         const tokens = await getOAuthTokens(code);
         const meData = await getUserData(tokens) as OsuUser;
@@ -60,8 +68,8 @@ export const GET = (async ({ url, locals }) => {
             osu: {
                 id: meData.id.toString(),
                 username: meData.username,
-                joinDate: new Date(meData.join_date)
-            }
+                joinDate: new Date(meData.join_date),
+            },
         });
 
         if (isUserEligible(meData)) {
@@ -79,7 +87,7 @@ export const GET = (async ({ url, locals }) => {
                 return data;
             }
 
-            data.error = `osu! account is not older than 6 months yet (account age is ${data.osu.joinDate.toUTCString()})`
+            data.error = `osu! account is not older than 6 months yet (account age is ${data.osu.joinDate?.toUTCString() ?? 'unknown'})`
             return data;
         });
 

@@ -24,7 +24,8 @@ interface SessionData {
 	osu?: {
 		id?: string;
 		username?: string;
-		joinDate: Date
+		joinDate?: Date;
+		state?: string;
 	}
 	discord?: {
 		id?: string;
