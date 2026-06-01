@@ -1,3 +1,3 @@
-export const load = (async ({ locals }) => {
-    await locals.session.destroy()
-})
+export const load = async ({ locals }) => {
+	await locals.session.destroy();
+};

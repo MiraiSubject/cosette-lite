@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { ITournamentConfig } from "config";
+	import type { ITournamentConfig } from 'config';
 	import type { PageData } from './$types';
 
 	interface Props {
@@ -9,7 +9,6 @@
 
 	let { data, config = data.config }: Props = $props();
 </script>
-
 
 <div class="start">
 	<div>

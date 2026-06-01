@@ -18,14 +18,15 @@
 					return;
 				}
 				if (data.result === 'full') {
-					errorMessage = 'You have joined the maximum number of servers. Please leave one and try again.';
+					errorMessage =
+						'You have joined the maximum number of servers. Please leave one and try again.';
 					return;
 				}
 				errorMessage = data.message || 'An unknown error occurred. Please try again.';
 				return;
 			}
 			errorMessage = 'Unable to contact the server. Please refresh this page.';
-		} catch (e) {
+		} catch {
 			errorMessage = 'Network error. Please check your connection and try again.';
 		}
 	});
@@ -41,5 +42,3 @@
 		{/if}
 	</div>
 </div>
-
-

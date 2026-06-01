@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { ITournamentConfig } from "config";
+	import type { ITournamentConfig } from 'config';
 	import type { PageData } from './$types';
 
 	interface Props {
@@ -9,10 +9,14 @@
 
 	let { data, config = data.config }: Props = $props();
 </script>
+
 <svelte:head>
 	<meta property="og:title" content="{config.name} verification" />
 	<meta property="og:type" content="website" />
-	<meta property="og:description" content="Verify your account easily using your osu! and Discord accounts for access to {config.name}." />
+	<meta
+		property="og:description"
+		content="Verify your account easily using your osu! and Discord accounts for access to {config.name}."
+	/>
 </svelte:head>
 
 <div class="start">

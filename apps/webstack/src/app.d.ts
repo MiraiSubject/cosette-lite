@@ -9,7 +9,7 @@ declare namespace App {
 		session: import('svelte-kit-cookie-session').Session<SessionData>;
 	}
 
-	type Session = SessionData
+	type Session = SessionData;
 
 	interface PageData {
 		session: SessionData;
@@ -26,13 +26,12 @@ interface SessionData {
 		username?: string;
 		joinDate?: Date;
 		state?: string;
-	}
+	};
 	discord?: {
 		id?: string;
 		state?: string;
 		accessToken?: string;
-	}
+	};
 	error?: string;
 	isReady?: boolean;
 }
-

@@ -13,7 +13,8 @@
 <div class="start">
 	<div class="user-info">
 		<p class="right-align">
-			Currently verifying {data.username || ''} ({data.osuId || ''}). <a href="/logout"><strong>Log out?</strong></a>
+			Currently verifying {data.username || ''} ({data.osuId || ''}).
+			<a href="/logout"><strong>Log out?</strong></a>
 		</p>
 	</div>
 	<div>
@@ -28,7 +29,7 @@
 			<li>Add the following roles to your account on the server:</li>
 		</ul>
 		<ul>
-			{#each config.discord.roles as role}
+			{#each config.discord.roles as role (role.id)}
 				<li>{role.name}</li>
 			{/each}
 		</ul>
