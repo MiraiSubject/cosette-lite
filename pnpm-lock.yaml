@@ -12,6 +12,8 @@ importers:
         specifier: ^7.3.0
         version: 7.4.4
 
+  apps/osu-api-proxy: {}
+
   apps/webstack:
     dependencies:
       config:

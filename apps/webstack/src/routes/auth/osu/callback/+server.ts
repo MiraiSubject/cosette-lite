@@ -1,52 +1,8 @@
-import { env } from '$env/dynamic/private';
-import { env as pubEnv } from '$env/dynamic/public';
 import { redirect } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { isUserEligible } from 'config';
 import type { OsuUser } from '$lib/OsuUser';
-
-async function getOAuthTokens(code: string) {
-    const url = 'https://osu.ppy.sh/oauth/token';
-    const body = JSON.stringify({
-        client_id: `${pubEnv.PUBLIC_OSU2_CLIENT_ID}`,
-        client_secret: `${env.OSU2_CLIENT_SECRET}`,
-        grant_type: 'authorization_code',
-        code,
-        redirect_uri: `${pubEnv.PUBLIC_BASE_URL}/auth/osu/callback`,
-    });
-
-    const response = await fetch(url, {
-        body,
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-    });
-    if (response.ok) {
-        const data = await response.json();
-        return data;
-    } else {
-        throw new Error(`Error fetching OAuth tokens: [${response.status}] ${response.statusText}`);
-    }
-}
-
-async function getUserData(tokens: {
-    access_token: string;
-    token_type: string;
-}) {
-    const url = 'https://osu.ppy.sh/api/v2/me';
-    const response = await fetch(url, {
-        headers: {
-            Authorization: `Bearer ${tokens.access_token}`,
-        },
-    });
-    if (response.ok) {
-        const data = await response.json();
-        return data;
-    } else {
-        throw new Error(`Error fetching user data: [${response.status}] ${response.statusText}`);
-    }
-}
+import { getOsuOAuthTokens, getOsuUserData } from '$lib/osu';
 
 // Write cookie for the state which will be used to compare later for the linked role stuff.
 export const GET = (async ({ url, locals }) => {
@@ -61,8 +17,8 @@ export const GET = (async ({ url, locals }) => {
         }
 
         if (!code) throw new Error('No code provided');
-        const tokens = await getOAuthTokens(code);
-        const meData = await getUserData(tokens) as OsuUser;
+        const tokens = await getOsuOAuthTokens(code);
+        const meData = await getOsuUserData(tokens) as OsuUser;
 
         await locals.session.set({
             osu: {

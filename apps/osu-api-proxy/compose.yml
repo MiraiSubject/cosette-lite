@@ -1,0 +1,20 @@
+services:
+  osu-api-proxy:
+    build:
+      context: ../..
+      dockerfile: apps/osu-api-proxy/Dockerfile
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      HOST: 0.0.0.0
+      PORT: 8787
+      OSU_PROXY_SHARED_SECRET: ${OSU_PROXY_SHARED_SECRET:?set OSU_PROXY_SHARED_SECRET}
+      OSU2_CLIENT_SECRET: ${OSU2_CLIENT_SECRET:?set OSU2_CLIENT_SECRET}
+    ports:
+      - "127.0.0.1:8787:8787"
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:8787/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 5s

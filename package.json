@@ -2,6 +2,7 @@
     "private": true,
     "scripts": {
         "dev": "pnpm --filter cosette-lite dev",
+        "dev:osu-proxy": "pnpm --filter osu-api-proxy dev",
         "lint": "pnpm --filter cosette-lite lint",
         "build": "pnpm --filter cosette-lite build",
         "check": "pnpm --filter cosette-lite check",
