@@ -10,5 +10,16 @@
     },
     "dependencies": {
         "dotenv-cli": "^7.3.0"
+    },
+    "pnpm": {
+        "overrides": {
+            "cookie": "0.7.2",
+            "defu": "6.1.5",
+            "flatted": "3.4.2",
+            "picomatch": "4.0.4",
+            "undici": "7.24.0",
+            "wrangler": "4.59.1",
+            "ws": "8.20.1"
+        }
     }
 }
